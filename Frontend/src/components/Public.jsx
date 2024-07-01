@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../App.css'; // Correct path within the src directory
-import yazaki from './yazaki.png'; // Import the image
+import yazaki from '../images/yazaki.png'; 
 
 const Public = () => {
   return (

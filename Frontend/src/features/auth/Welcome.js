@@ -9,7 +9,7 @@ const Welcome = () => {
   }).format(date);
 
   return (
-    <section className="welcome">
+    <section className="welcome you">
       <p>{today}</p>
       <h1>Welcome!</h1>
       <p><Link to="/dash/employee">View Employee</Link></p>
