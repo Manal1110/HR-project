@@ -55,8 +55,10 @@ const createNewUser= asyncHandler(async(req, res)=>{
 // @route PATCH /users
 // @access Private
 
+// usersController.js
+
 const updateUser = asyncHandler(async (req, res) => {
-    const { id, username, roles, active, password } = req.body;
+    const { id, username, roles, active } = req.body;
 
     // Validate required fields
     if (!id || !username || !Array.isArray(roles) || !roles.length || typeof active !== 'boolean') {
@@ -81,11 +83,6 @@ const updateUser = asyncHandler(async (req, res) => {
         user.roles = roles;
         user.active = active;
 
-        if (password) {
-            // Hash the new password
-            user.password = await bcrypt.hash(password, 10);
-        }
-
         const updatedUser = await user.save();
 
         res.json({ message: `${updatedUser.username} updated` });
@@ -93,6 +90,7 @@ const updateUser = asyncHandler(async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
 
 
 // @desc Delete a user
@@ -121,10 +119,15 @@ const deleteUser= asyncHandler(async(req, res)=>{
     res.json(reply)
 })
 
+// @desc Get the single user
+// @route GET /users/single
+// @access Private
+
 
 module.exports={
     getAllUsers,
     createNewUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    
 }

@@ -12,12 +12,16 @@ const userSchema= new mongoose.Schema({
 
     roles:[{
         type: String,
-        default:"Employee"
+        default:"General HR"
 
     }],
     active:{
         type: Boolean,
         default: true
+    },
+    
+    profileImage: {
+        type: String // Store image URL here
     }
 })
 
