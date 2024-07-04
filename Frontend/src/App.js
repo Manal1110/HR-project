@@ -15,9 +15,7 @@ function App() {
         <Route path="login" element={<Login />} />
 
         <Route path="dash" element={<DashLayout />}>
-          {/* Render Welcome component only once */}
           <Route index element={<Welcome />} />
-          {/* Other routes */}
           <Route path="employee" element={<EmployeeList />} />
           <Route path="users" element={<UsersL />} />
         </Route>
