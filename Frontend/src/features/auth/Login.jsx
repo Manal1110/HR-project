@@ -47,18 +47,18 @@ const Login = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-blue-200 items-center justify-center">
+        <div className="flex flex-col h-screen bg-blue-200 items-center justify-center font-playfair">
             <div className="bg-gray-100 rounded-lg shadow-lg p-8 md:p-32 flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-12 w-full max-w-5xl">
                 <div className="w-full md:w-1/2 flex items-center justify-center">
                     <img src={yazakiLogo} alt="Yazaki Logo" className="h-auto w-auto pr-12" />
                 </div>
                 <div className="w-full md:w-1/2">
                     <header className="text-center md:text-left mb-6">
-                        <h1 className="text-3xl font-bold">SE CONNECTER</h1>
+                        <h1 className="text-3xl font-bold">Se connecter</h1>
                     </header>
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div className="space-y-2">
-                            <label htmlFor="username" className="block text-sm font-bold text-gray-700">IDENTIFIANT/ MATRICULE:</label>
+                            <label htmlFor="username" className="block text-sm font-bold text-gray-700">Identifiant/ Matricule:</label>
                             <input
                                 type="text"
                                 id="username"
@@ -72,7 +72,7 @@ const Login = () => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label htmlFor="password" className="block text-sm font-bold text-gray-700">MOT DE PASSE:</label>
+                            <label htmlFor="password" className="block text-sm font-bold text-gray-700">Mot de passe:</label>
                             <input
                                 type="password"
                                 id="password"
@@ -86,8 +86,8 @@ const Login = () => {
                         <div className="text-right">
                             <Link to="#" className="text-sm font-bold text-gray-600 hover:underline">MOT DE PASSE OUBLIÉ?</Link>
                         </div>
-                        <button type="submit" className="w-full py-2 bg-hoverpurple text-white font-bold rounded-full hover:bg-hoverpurple disabled:opacity-50" disabled={isLoading}>
-                            {isLoading ? 'Logging in...' : 'SE CONNECTER'}
+                        <button type="submit" className="w-full py-2 bg-blue-700 text-white font-bold rounded-full hover:bg-hoverpurple disabled:opacity-50" disabled={isLoading}>
+                            {isLoading ? 'Logging in...' : 'Se connecter'}
                         </button>
                         {errMsg && (
                             <p ref={errRef} className="text-hoverpurple text-sm mt-2" aria-live="assertive">
