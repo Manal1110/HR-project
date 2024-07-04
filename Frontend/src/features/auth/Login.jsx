@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from './authSlice';
 import { useLoginMutation } from './authApiSlice';
+import yazakiLogo from '../../images/yazaki.png'; // Ensure the path to the logo is correct
 
 const Login = () => {
     const userRef = useRef(null);
@@ -46,16 +47,18 @@ const Login = () => {
     };
 
     return (
-        <section className="min-h-screen flex flex-col items-center justify-center bg-gray-100 font-playfair">
-            <div className="bg-white shadow-md rounded-md p-6 w-full max-w-md">
-                <header className="mb-4 text-center">
-                    <h1 className="text-2xl font-semibold">Welcome Back!</h1>
-                    <p className="text-gray-600">Sign in to access your account</p>
-                </header>
-                <main>
-                    <form className="space-y-4" onSubmit={handleSubmit}>
-                        <div className="space-y-1">
-                            <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username:</label>
+        <div className="flex flex-col h-screen bg-blue-200 items-center justify-center">
+            <div className="bg-gray-100 rounded-lg shadow-lg p-8 md:p-32 flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-12 w-full max-w-5xl">
+                <div className="w-full md:w-1/2 flex items-center justify-center">
+                    <img src={yazakiLogo} alt="Yazaki Logo" className="h-auto w-auto pr-12" />
+                </div>
+                <div className="w-full md:w-1/2">
+                    <header className="text-center md:text-left mb-6">
+                        <h1 className="text-3xl font-bold">SE CONNECTER</h1>
+                    </header>
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                        <div className="space-y-2">
+                            <label htmlFor="username" className="block text-sm font-bold text-gray-700">IDENTIFIANT/ MATRICULE:</label>
                             <input
                                 type="text"
                                 id="username"
@@ -64,35 +67,37 @@ const Login = () => {
                                 onChange={(e) => setUsername(e.target.value)}
                                 autoComplete="off"
                                 required
-                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-hoverpurple"
+                                placeholder="0000000"
                             />
                         </div>
-                        <div className="space-y-1">
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password:</label>
+                        <div className="space-y-2">
+                            <label htmlFor="password" className="block text-sm font-bold text-gray-700">MOT DE PASSE:</label>
                             <input
                                 type="password"
                                 id="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-hoverpurple"
+                                placeholder="********"
                             />
                         </div>
-                        <button type="submit" className="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 disabled:opacity-50" disabled={isLoading}>
-                            {isLoading ? 'Logging in...' : 'Sign In'}
+                        <div className="text-right">
+                            <Link to="#" className="text-sm font-bold text-gray-600 hover:underline">MOT DE PASSE OUBLIÉ?</Link>
+                        </div>
+                        <button type="submit" className="w-full py-2 bg-hoverpurple text-white font-bold rounded-full hover:bg-hoverpurple disabled:opacity-50" disabled={isLoading}>
+                            {isLoading ? 'Logging in...' : 'SE CONNECTER'}
                         </button>
                         {errMsg && (
-                            <p ref={errRef} className="text-red-500 text-sm mt-2" aria-live="assertive">
+                            <p ref={errRef} className="text-hoverpurple text-sm mt-2" aria-live="assertive">
                                 {errMsg}
                             </p>
                         )}
                     </form>
-                </main>
-                <footer className="mt-4 text-center">
-                    <Link to="/" className="text-indigo-600 hover:underline">Back to Home</Link>
-                </footer>
+                </div>
             </div>
-        </section>
+        </div>
     );
 };
 
