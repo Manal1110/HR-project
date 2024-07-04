@@ -83,6 +83,10 @@ const employeeSchema = new mongoose.Schema({
     },
     pointage: {
         type: String
+    },
+    
+    profilePic: {
+        type: String // Assuming it's a URL to the profile picture
     }
 });
 

@@ -7,17 +7,25 @@
 .employee-table th, .employee-table td {
     border: 1px solid #ddd;
     padding: 8px;
-    text-align: left;
 }
 
 .employee-table th {
     background-color: #f2f2f2;
+    text-align: left;
 }
 
-.employee-table tr:nth-child(even) {
-    background-color: #f9f9f9;
+.profile-pic {
+    width: 50px; /* Adjust size as needed */
+    height: 50px; /* Adjust size as needed */
+    border-radius: 50%;
 }
 
-.employee-table tr:hover {
-    background-color: #e2f4ff;
+.default-profile-pic {
+    width: 50px; /* Adjust size as needed */
+    height: 50px; /* Adjust size as needed */
+    background-color: #ccc;
+    color: #fff;
+    text-align: center;
+    line-height: 50px; /* Center vertically */
+    border-radius: 50%;
 }
