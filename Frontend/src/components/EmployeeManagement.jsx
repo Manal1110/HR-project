@@ -36,7 +36,8 @@ const EmployeeManagement = () => {
         level: '',
         speciality: '',
         adresse: '',
-        pointage: ''
+        pointage: '',
+        profilePic:''
     });
 
     useEffect(() => {
@@ -95,7 +96,8 @@ const EmployeeManagement = () => {
             level: '',
             speciality: '',
             adresse: '',
-            pointage: ''
+            pointage: '',
+            profilePic: ''
         });
     };
 
@@ -168,6 +170,7 @@ const EmployeeManagement = () => {
             <table className="employee-table">
                 <thead>
                     <tr>
+                        <th>Profile picture </th>
                         <th>Matricule</th>
                         <th>Name</th>
                         <th>First Name</th>
@@ -200,6 +203,11 @@ const EmployeeManagement = () => {
                 <tbody>
                     {filteredEmployees.map(employee => (
                         <tr key={employee._id}>
+                            <td>
+                                {employee.profilePic && (
+                                    <img src={employee.profilePic} alt={`${employee.name}'s profile`} className="profile-pic" />
+                                )}
+                            </td>
                             <td>{employee.matricule}</td>
                             <td>{employee.name}</td>
                             <td>{employee.firstName}</td>
@@ -422,6 +430,13 @@ const EmployeeManagement = () => {
                             onChange={handleChange}
                             placeholder="Pointage"
                         />
+                        <input
+                            type="text"
+                            name="profilePic"
+                            value={formData.profilePic}
+                            onChange={handleChange}
+                            placeholder="Profile Picture URL"
+                        />              
                         <button type="submit">{editMode ? 'Update' : 'Create'}</button>
                         <button type="button" onClick={handleEditCancel}>Cancel</button>
                     </form>
