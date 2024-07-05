@@ -40,6 +40,36 @@ const EmployeeManagement = () => {
         profilePic:''
     });
 
+    const [selectedFields, setSelectedFields] = useState({
+        matricule: true,
+        name: true,
+        firstName: true,
+        unite: true,
+        department: true,
+        kind: true,
+        situation: true,
+        service: true,
+        gender: true,
+        cc: true,
+        kindCC: true,
+        directManager: true,
+        manager: true,
+        familySituation: true,
+        numberOfChildren: true,
+        dateOfBirth: true,
+        age: true,
+        hireDate: true,
+        seniority: true,
+        fonction: true,
+        cin: true,
+        category: true,
+        level: true,
+        speciality: true,
+        adresse: true,
+        pointage: true,
+        profilePic: true
+    });
+
     useEffect(() => {
         fetchEmployees();
     }, []);
@@ -122,6 +152,14 @@ const EmployeeManagement = () => {
         });
     };
 
+    const handleFieldSelectionChange = (e) => {
+        const { name, checked } = e.target;
+        setSelectedFields({
+            ...selectedFields,
+            [name]: checked
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -137,12 +175,13 @@ const EmployeeManagement = () => {
         }
     };
 
+
     const handleDownloadExcel = () => {
-        const selectedFields = ['matricule', 'name', 'firstName', 'unite', 'department', 'kind', 'situation', 'service', 'gender', 'cc', 'kindCC', 'directManager', 'manager', 'familySituation', 'numberOfChildren', 'dateOfBirth', 'age', 'hireDate', 'seniority', 'fonction', 'cin', 'category', 'level', 'speciality', 'adresse', 'pointage'];
-        
+        const fieldsToDownload = Object.keys(selectedFields).filter(field => selectedFields[field]);
+
         const filteredData = filteredEmployees.map(employee => {
             const filteredEmployee = {};
-            selectedFields.forEach(field => {
+            fieldsToDownload.forEach(field => {
                 filteredEmployee[field] = employee[field];
             });
             return filteredEmployee;
@@ -166,6 +205,19 @@ const EmployeeManagement = () => {
                 value={searchTerm}
                 onChange={handleSearch}
             />
+            <div className="field-selection">
+                {Object.keys(selectedFields).map(field => (
+                    <label key={field}>
+                        <input
+                            type="checkbox"
+                            name={field}
+                            checked={selectedFields[field]}
+                            onChange={handleFieldSelectionChange}
+                        />
+                        {field}
+                    </label>
+                ))}
+            </div>
             <button onClick={handleDownloadExcel}>Download Excel</button>
             <table className="employee-table">
                 <thead>
