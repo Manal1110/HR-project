@@ -15,17 +15,25 @@
 }
 
 .profile-pic {
-    width: 50px; /* Adjust size as needed */
-    height: 50px; /* Adjust size as needed */
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
 }
 
-.default-profile-pic {
-    width: 50px; /* Adjust size as needed */
-    height: 50px; /* Adjust size as needed */
-    background-color: #ccc;
-    color: #fff;
-    text-align: center;
-    line-height: 50px; /* Center vertically */
-    border-radius: 50%;
+.field-selection {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 10px 0;
+}
+
+.field-selection label {
+    margin-right: 10px;
+}
+
+.edit-form {
+    margin-top: 20px;
+}
+
+.edit-form div {
+    margin-bottom: 10px;
 }
