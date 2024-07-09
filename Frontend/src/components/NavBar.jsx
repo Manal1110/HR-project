@@ -27,9 +27,9 @@ const NavBar = () => {
                 <NavLink to="/dash" label="Dashboard Total" icon="fas fa-home" />
                 <NavLink to="/dash" label="Dashboard Combu" icon="fas fa-chart-bar" />
                 <NavLink to="/dash" label="Dashboard Hub" icon="fas fa-th" />
-                <NavLink to="/dash" label="Employees" icon="fas fa-users" />
+                <NavLink to="/dash/employees" label="Employees" icon="fas fa-users" />
                 <NavLink to="/" label="Check-In/Out" icon="fas fa-clock" />
-                <NavLink to="/profile" label="Profile" icon="fas fa-user" />
+                <NavLink to="/dash/profile" label="Profile" icon="fas fa-user" />
                 <NavLink to="/settings" label="Setting" icon="fas fa-cog" />
             </nav>
             <LogoutButton sendLogout={sendLogout} />
