@@ -9,7 +9,9 @@ module.exports = {
       },
       colors: {
         hoverpurple: '#5932EA',
-        zinc: '#D9D9D9'
+        zinc: '#D9D9D9',
+        lightpurple: '#D5D5F5',
+        darkpurple: '#01008A',
       },
     },
   },
