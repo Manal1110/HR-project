@@ -70,6 +70,8 @@ const EmployeeManagement = () => {
         profilePic: true
     });
 
+    const [showFilters, setShowFilters] = useState(false);
+
     useEffect(() => {
         fetchEmployees();
     }, []);
@@ -197,40 +199,50 @@ const EmployeeManagement = () => {
 
     return (
         <div className="max-w-screen overflow-x-hidden mx-auto px-4 py-8 font-playfair">
-            <h1 className="text-2xl font-bold mb-4">Employee Management</h1>
-            <input
-                type="text"
-                placeholder="Search by Matricule"
-                value={searchTerm}
-                onChange={handleSearch}
-                className="mb-4 p-2 border rounded w-full"
-            />
-            <div className="mb-4 overflow-x-auto whitespace-nowrap">
-                {Object.keys(selectedFields).map(field => (
-                    <label key={field} className="inline-block mr-4">
-                        <input
-                            type="checkbox"
-                            name={field}
-                            checked={selectedFields[field]}
-                            onChange={handleFieldSelectionChange}
-                            className="mr-2"
-                        />
-                        {field}
-                    </label>
-                ))}
+        <h1 className="text-2xl font-bold mb-4">Employee Management</h1>
+        <input
+            type="text"
+            placeholder="Search by Matricule"
+            value={searchTerm}
+            onChange={handleSearch}
+            className="mb-4 p-2 border rounded w-full"
+        />
+        <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="my-4 mr-4 bg-darkpurple hover:hoverpurple text-white px-4 py-2 rounded"
+        >
+            Filter
+        </button>
+        {showFilters && (
+            <div className="mb-4 overflow-x-auto whitespace-nowrap p-4 bg-white shadow rounded-lg">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {Object.keys(selectedFields).map(field => (
+                        <label key={field} className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                name={field}
+                                checked={selectedFields[field]}
+                                onChange={handleFieldSelectionChange}
+                                className="form-checkbox h-5 w-5 text-indigo-600"
+                            />
+                            <span className="text-gray-700">{field}</span>
+                        </label>
+                    ))}
+                </div>
             </div>
-            <button onClick={handleDownloadExcel} className="mb-4 bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                Download Excel
-            </button>
-            <div className="table-container max-w-full overflow-x-auto">
-                <table className="min-w-full border-collapse ">
-                    <thead>
+        )}
+        <button onClick={handleDownloadExcel} className="mb-4 bg-darkpurple hover:hoverpurple text-white px-4 py-2 rounded">
+            Download Excel
+        </button>
+        <div className="table-container max-w-full overflow-x-auto">
+            <table className="min-w-full border-collapse">
+                <thead>
                         <tr className="bg-darkpurple text-white">
                             {selectedFields.profilePic && <th className=" px-12 py-8 whitespace-nowrap">Profile Picture</th>}
-                            {selectedFields.matricule && <th className=" px-12 py-4 whitespace-nowrap">Matricule</th>}
-                            {selectedFields.name && <th className=" px-12 py-4 whitespace-nowrap">Name</th>}
-                            {selectedFields.firstName && <th className=" px-12 py-4 whitespace-nowrap">First Name</th>}
-                            {selectedFields.unite && <th className=" px-12 py-4 whitespace-nowrap">Unite</th>}
+                            {selectedFields.matricule && <th className=" px-12 py-8 whitespace-nowrap">Matricule</th>}
+                            {selectedFields.name && <th className=" px-12 py-8 whitespace-nowrap">Name</th>}
+                            {selectedFields.firstName && <th className=" px-12 py-8 whitespace-nowrap">First Name</th>}
+                            {selectedFields.unite && <th className=" px-12 py-8 whitespace-nowrap">Unite</th>}
                             {selectedFields.department && <th className=" px-12 py-4 whitespace-nowrap">Department</th>}
                             {selectedFields.kind && <th className=" px-12 py-4 whitespace-nowrap">Kind</th>}
                             {selectedFields.situation && <th className=" px-12 py-4 whitespace-nowrap">Situation</th>}
@@ -258,8 +270,10 @@ const EmployeeManagement = () => {
                     </thead>
                     <tbody>
                         {filteredEmployees.map((employee, index) => (
-                            <tr key={employee._id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-100 hover:bg-gray-200'}>
-                            {selectedFields.profilePic && (
+                            <tr 
+                                key={employee._id} 
+                                className={`transition-colors duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white hover:bg-midpurple' : 'bg-lightpurple hover:bg-midpurple'}`}
+                            >                            {selectedFields.profilePic && (
                                 <td className="px-2 py-1 whitespace-nowrap text-center align-middle">
                                     {employee.profilePic && (
                                         <div className="flex justify-center">
@@ -269,36 +283,36 @@ const EmployeeManagement = () => {
                                 </td>
                             )}
                                 {selectedFields.matricule && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.matricule}</td>}
-                                {selectedFields.name && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.name}</td>}
-                                {selectedFields.firstName && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.firstName}</td>}
-                                {selectedFields.unite && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.unite}</td>}
-                                {selectedFields.department && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.department}</td>}
-                                {selectedFields.kind && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.kind}</td>}
-                                {selectedFields.situation && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.situation}</td>}
-                                {selectedFields.service && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.service}</td>}
-                                {selectedFields.gender && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.gender}</td>}
-                                {selectedFields.cc && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.cc}</td>}
-                                {selectedFields.kindCC && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.kindCC}</td>}
-                                {selectedFields.directManager && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.directManager}</td>}
-                                {selectedFields.manager && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.manager}</td>}
-                                {selectedFields.familySituation && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.familySituation}</td>}
-                                {selectedFields.numberOfChildren && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.numberOfChildren}</td>}
-                                {selectedFields.dateOfBirth && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{new Date(employee.dateOfBirth).toLocaleDateString()}</td>}
-                                {selectedFields.age && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.age}</td>}
-                                {selectedFields.hireDate && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{new Date(employee.hireDate).toLocaleDateString()}</td>}
-                                {selectedFields.seniority && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.seniority}</td>}
-                                {selectedFields.fonction && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.fonction}</td>}
-                                {selectedFields.cin && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.cin}</td>}
-                                {selectedFields.category && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.category}</td>}
-                                {selectedFields.level && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.level}</td>}
-                                {selectedFields.speciality && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.speciality}</td>}
-                                {selectedFields.adresse && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.adresse}</td>}
-                                {selectedFields.pointage && <td className=" px-2 py-1 whitespace-nowrap text-center align-middle">{employee.pointage}</td>}
-                                <td className=" px-2 py-1 whitespace-nowrap">
+                                {selectedFields.name && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.name}</td>}
+                                {selectedFields.firstName && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.firstName}</td>}
+                                {selectedFields.unite && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.unite}</td>}
+                                {selectedFields.department && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.department}</td>}
+                                {selectedFields.kind && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.kind}</td>}
+                                {selectedFields.situation && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.situation}</td>}
+                                {selectedFields.service && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.service}</td>}
+                                {selectedFields.gender && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.gender}</td>}
+                                {selectedFields.cc && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.cc}</td>}
+                                {selectedFields.kindCC && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.kindCC}</td>}
+                                {selectedFields.directManager && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.directManager}</td>}
+                                {selectedFields.manager && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.manager}</td>}
+                                {selectedFields.familySituation && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.familySituation}</td>}
+                                {selectedFields.numberOfChildren && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.numberOfChildren}</td>}
+                                {selectedFields.dateOfBirth && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{new Date(employee.dateOfBirth).toLocaleDateString()}</td>}
+                                {selectedFields.age && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.age}</td>}
+                                {selectedFields.hireDate && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{new Date(employee.hireDate).toLocaleDateString()}</td>}
+                                {selectedFields.seniority && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.seniority}</td>}
+                                {selectedFields.fonction && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.fonction}</td>}
+                                {selectedFields.cin && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.cin}</td>}
+                                {selectedFields.category && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.category}</td>}
+                                {selectedFields.level && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.level}</td>}
+                                {selectedFields.speciality && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.speciality}</td>}
+                                {selectedFields.adresse && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.adresse}</td>}
+                                {selectedFields.pointage && <td className=" px-2 py-8 whitespace-nowrap text-center align-middle">{employee.pointage}</td>}
+                                <td className="px-2 py-8 whitespace-nowrap">
                                     <div className="flex space-x-2">
                                         <button
                                             onClick={() => handleEditClick(employee)}
-                                            className="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded"
+                                            className="bg-darkpurple hover:bg-hoverpurple text-white px-2 py-1 rounded"
                                         >
                                             Edit
                                         </button>
