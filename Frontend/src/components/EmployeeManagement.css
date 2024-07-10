@@ -1,39 +1,17 @@
-.employee-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+/* custom-scrollbar.css */
+::-webkit-scrollbar {
+    height: 12px;
 }
 
-.employee-table th, .employee-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
 }
 
-.employee-table th {
-    background-color: #f2f2f2;
-    text-align: left;
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
 }
 
-.profile-pic {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-}
-
-.field-selection {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 10px 0;
-}
-
-.field-selection label {
-    margin-right: 10px;
-}
-
-.edit-form {
-    margin-top: 20px;
-}
-
-.edit-form div {
-    margin-bottom: 10px;
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
