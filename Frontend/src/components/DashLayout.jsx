@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import NavBar from './NavBar';
 import Header from './Header';
 import DashFooter from './DashFooter';
+import EmployeeManagement from './EmployeeManagement';
 
 const DashLayout = () => {
     return (
@@ -9,7 +10,7 @@ const DashLayout = () => {
             <Header />
             <div className="flex flex-1">
                 <NavBar />
-                <div className="flex flex-col flex-1 p-4">
+                <div className="flex-1 overflow-hidden">
                     <Outlet />
                 </div>
             </div>
