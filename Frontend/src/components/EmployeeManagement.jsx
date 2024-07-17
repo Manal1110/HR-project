@@ -12,6 +12,7 @@ const EmployeeManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredEmployees, setFilteredEmployees] = useState([]);
     const [editMode, setEditMode] = useState(false);
+    const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
         matricule: '',
         name: '',
@@ -101,6 +102,7 @@ const EmployeeManagement = () => {
         setFormData(employee);
         setEditMode(true);
     };
+    
 
     const handleEditCancel = () => {
         setEditMode(false);
@@ -179,6 +181,22 @@ const EmployeeManagement = () => {
         }
     };
 
+    const handleSubmit1 = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post('http://localhost:3500/employees', formData);
+            console.log('Employee created:', response.data);
+            window.location.reload(); // Refresh the page
+        } catch (error) {
+            console.error('Error creating employee:', error);
+           
+        }
+    };
+
+    const handleButtonClick = () => {
+        setShowForm(true);
+    };
+
     const handleDownloadExcel = () => {
         const fieldsToDownload = Object.keys(selectedFields).filter(field => selectedFields[field]);
 
@@ -207,6 +225,10 @@ const EmployeeManagement = () => {
 
     if (error) return <p>{error}</p>;
     if (error) return <p>{error}</p>;
+
+
+
+
 
 
     return (
@@ -246,6 +268,46 @@ const EmployeeManagement = () => {
         <button onClick={handleDownloadExcel} className="mb-4 bg-darkpurple hover:hoverpurple text-white px-4 py-2 rounded">
             Download Excel
         </button>
+        <div>
+            {!showForm && (
+                <button onClick={handleButtonClick}>Add New Employee</button>
+            )}
+
+            {showForm && (
+                <form onSubmit={handleSubmit1}>
+                    <input type="text" name="matricule" value={formData.matricule} onChange={handleChange} placeholder="Matricule" required />
+                    <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
+                    <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="First Name" required />
+                    <input type="text" name="unite" value={formData.unite} onChange={handleChange} placeholder="Unite" required />
+                    <input type="text" name="department" value={formData.department} onChange={handleChange} placeholder="Department" required />
+                    <input type="text" name="kind" value={formData.kind} onChange={handleChange} placeholder="Kind" required />
+                    <input type="text" name="situation" value={formData.situation} onChange={handleChange} placeholder="Situation" required />
+                    <input type="text" name="service" value={formData.service} onChange={handleChange} placeholder="Service" required />
+                    <input type="text" name="gender" value={formData.gender} onChange={handleChange} placeholder="Gender" required />
+                    <input type="text" name="cc" value={formData.cc} onChange={handleChange} placeholder="CC" required />
+                    <input type="text" name="kindCC" value={formData.kindCC} onChange={handleChange} placeholder="Kind CC" required />
+                    <input type="text" name="directManager" value={formData.directManager} onChange={handleChange} placeholder="Direct Manager" required />
+                    <input type="text" name="manager" value={formData.manager} onChange={handleChange} placeholder="Manager" required />
+                    <input type="text" name="familySituation" value={formData.familySituation} onChange={handleChange} placeholder="Family Situation" required />
+                    <input type="number" name="numberOfChildren" value={formData.numberOfChildren} onChange={handleChange} placeholder="Number of Children" required />
+                    <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} placeholder="Date of Birth" required />
+                    <input type="number" name="age" value={formData.age} onChange={handleChange} placeholder="Age" required />
+                    <input type="date" name="hireDate" value={formData.hireDate} onChange={handleChange} placeholder="Hire Date" required />
+                    <input type="text" name="seniority" value={formData.seniority} onChange={handleChange} placeholder="Seniority" required />
+                    <input type="text" name="fonction" value={formData.fonction} onChange={handleChange} placeholder="Fonction" required />
+                    <input type="text" name="cin" value={formData.cin} onChange={handleChange} placeholder="CIN" required />
+                    <input type="text" name="category" value={formData.category} onChange={handleChange} placeholder="Category" required />
+                    <input type="text" name="level" value={formData.level} onChange={handleChange} placeholder="Level" required />
+                    <input type="text" name="speciality" value={formData.speciality} onChange={handleChange} placeholder="Speciality" required />
+                    <input type="text" name="adresse" value={formData.adresse} onChange={handleChange} placeholder="Adress" required />
+                    <input type="text" name="pointage" value={formData.pointage} onChange={handleChange} placeholder="Pointage" required />
+                    <input type="text" name="profilePic" value={formData.profilePic} onChange={handleChange} placeholder="Profile Picture Link" required />
+                    {/* Add other input fields for each property in your schema */}
+                    <button type="submit">Create Employee</button>
+                </form>
+            )}
+        </div>
+     
         <div className="table-container max-w-full overflow-x-auto">
             <table className="min-w-full border-collapse">
                 <thead>
@@ -572,6 +634,7 @@ const EmployeeManagement = () => {
                                 Cancel
                             </button>
                         </div>
+
                     </form>
                 </div>
             )}
