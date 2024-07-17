@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import './EmployeeManagement.css';
+import HashLoader from 'react-spinners/HashLoader';
+
 
 const EmployeeManagement = () => {
     const [employees, setEmployees] = useState([]);
@@ -194,6 +196,7 @@ const EmployeeManagement = () => {
     const handleButtonClick = () => {
         setShowForm(true);
     };
+
     const handleDownloadExcel = () => {
         const fieldsToDownload = Object.keys(selectedFields).filter(field => selectedFields[field]);
 
@@ -211,8 +214,18 @@ const EmployeeManagement = () => {
         XLSX.writeFile(wb, 'employees.xlsx');
     };
 
-    if (loading) return <p>Loading...</p>;
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <HashLoader size={100} color={"#123abc"} />
+            </div>
+        );
+    }
+
     if (error) return <p>{error}</p>;
+    if (error) return <p>{error}</p>;
+
 
 
 
@@ -220,7 +233,6 @@ const EmployeeManagement = () => {
 
     return (
         <div className="max-w-screen overflow-x-hidden mx-auto px-4 py-8 font-playfair">
-        
         <h1 className="text-2xl font-bold mb-4">Employee Management</h1>
         <input
             type="text"
@@ -295,8 +307,7 @@ const EmployeeManagement = () => {
                 </form>
             )}
         </div>
-
-        
+     
         <div className="table-container max-w-full overflow-x-auto">
             <table className="min-w-full border-collapse">
                 <thead>
@@ -392,7 +403,7 @@ const EmployeeManagement = () => {
                     </tbody>
                 </table>
             </div>
-            
+
             {editMode && (
                 <div className="mt-8">
                     <h2 className="text-xl font-bold mb-4">Edit Employee</h2>
@@ -623,8 +634,6 @@ const EmployeeManagement = () => {
                                 Cancel
                             </button>
                         </div>
-
-
 
                     </form>
                 </div>
