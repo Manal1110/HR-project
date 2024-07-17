@@ -23,3 +23,25 @@
 .table-container:hover::-webkit-scrollbar {
     height: 12px;
 }
+
+/* EmployeeManagement.css */
+
+.modal {
+    transition: transform 0.3s ease-in-out;
+}
+
+.modal-enter {
+    transform: translateY(-50%);
+}
+
+.modal-enter-active {
+    transform: translateY(0);
+}
+
+.modal-exit {
+    transform: translateY(0);
+}
+
+.modal-exit-active {
+    transform: translateY(-50%);
+}

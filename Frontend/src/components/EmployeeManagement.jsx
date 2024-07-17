@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
-import './EmployeeManagement.css';
 import HashLoader from 'react-spinners/HashLoader';
 import EmployeeTable from './EmployeeTable';
 import EmployeeForm from './EmployeeForm';
@@ -17,7 +16,6 @@ const EmployeeManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredEmployees, setFilteredEmployees] = useState([]);
     const [editMode, setEditMode] = useState(false);
-    const [showForm, setShowForm] = useState(false);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [formData, setFormData] = useState({
         matricule: '',
@@ -216,7 +214,6 @@ const EmployeeManagement = () => {
         XLSX.writeFile(wb, 'employees.xlsx');
     };
 
-
     const openModal = () => {
         setModalIsOpen(true);
     };
@@ -250,16 +247,16 @@ const EmployeeManagement = () => {
                 <div>
                     <button
                         onClick={() => setShowFilters(!showFilters)}
-                        className="bg-darkpurple hover:hoverpurple text-white px-4 py-2 rounded mr-4"
+                        className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded mr-4"
                     >
                         Filter
                     </button>
-                    <button onClick={handleDownloadExcel} className="bg-darkpurple hover:hoverpurple text-white px-4 py-2 rounded">
+                    <button onClick={handleDownloadExcel} className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded">
                         Download Excel
                     </button>
                 </div>
                 <div>
-                    <button onClick={openModal} className="bg-darkpurple hover:hoverpurple text-white px-4 py-2 rounded">
+                    <button onClick={openModal} className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded">
                         Add New Employee
                     </button>
                 </div>
@@ -276,10 +273,18 @@ const EmployeeManagement = () => {
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 contentLabel="Add/Edit Employee"
-                className="flex items-center justify-center fixed inset-0 z-50 outline-none focus:outline-none"
+                className="fixed inset-0 flex items-center justify-center z-50 outline-none focus:outline-none transition-transform transform-gpu ease-in-out duration-300"
                 overlayClassName="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
             >
-                <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg mx-auto">
+                <div className="relative bg-white p-8 rounded-2xl shadow-2xl w-full max-w-3xl mx-auto space-y-6 animate-slideDown my-12">
+                    <button
+                        onClick={closeModal}
+                        className="absolute top-2 right-2 mt-8 mr-8 text-gray-600 hover:text-gray-900 focus:outline-none"
+                    >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                     <EmployeeForm
                         formData={formData}
                         handleChange={handleChange}
@@ -289,6 +294,7 @@ const EmployeeManagement = () => {
                     />
                 </div>
             </Modal>
+
 
             <EmployeeTable
                 filteredEmployees={filteredEmployees}

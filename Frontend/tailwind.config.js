@@ -1,11 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
-  darkMode: true, // or 'media' or 'class'
+  darkMode: 'class', // Updated to use 'class'
   theme: {
     extend: {
       fontFamily: {
-        playfair: ['Playfair Display', 'serif'], // Example of adding a custom font
+        playfair: ['Playfair Display', 'serif'], // Custom font
       },
       colors: {
         hoverpurple: '#5932EA',
@@ -14,11 +14,19 @@ module.exports = {
         midpurple: '#E7E7FF',
         darkpurple: '#01008A',
       },
+      keyframes: {
+        slideDown: {
+          '0%': { transform: 'translateY(-100%)' },
+          '100%': { transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        slideDown: 'slideDown 0.8s ease-in-out',
+      },
     },
   },
   variants: {
-    extend: {
-    },
+    extend: {},
   },
   plugins: [],
 }

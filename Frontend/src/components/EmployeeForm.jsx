@@ -2,7 +2,7 @@ import React from 'react';
 
 const EmployeeForm = ({ formData, handleChange, handleSubmit, handleSubmit1, handleEditCancel, editMode }) => {
     return (
-        <div className="mt-8">
+        <div className="mt-8 font-playfair">
             <h2 className="text-xl font-bold mb-4">{editMode ? 'Edit Employee' : 'Create Employee'}</h2>
             <form onSubmit={editMode ? handleSubmit : handleSubmit1} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -20,7 +20,7 @@ const EmployeeForm = ({ formData, handleChange, handleSubmit, handleSubmit1, han
                         value={formData.name}
                         onChange={handleChange}
                         placeholder="Name"
-                        className="p-8 border rounded"
+                        className="p-2 border rounded"
                     />
                     <input
                         type="text"
@@ -223,15 +223,15 @@ const EmployeeForm = ({ formData, handleChange, handleSubmit, handleSubmit1, han
                         className="p-2 border rounded"
                     />
                 </div>
-                <div className="flex space-x-4">
-                    <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                        {editMode ? 'Update' : 'Create'}
-                    </button>
+                <div className="flex justify-between space-x-4">
                     {editMode && (
                         <button type="button" onClick={handleEditCancel} className="bg-gray-500 text-white px-4 py-2 rounded">
                             Cancel
                         </button>
                     )}
+                    <button type="submit" className="bg-darkpurple hover:bg-hoverpurple text-white px-12 py-2 rounded ml-auto text-lg">
+                        {editMode ? 'Update' : 'Create'}
+                    </button>
                 </div>
             </form>
         </div>
