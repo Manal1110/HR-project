@@ -220,6 +220,7 @@ const EmployeeManagement = () => {
         }
     };
 
+
     const handleDownloadExcel = () => {
         const fieldsToDownload = Object.keys(selectedFields).filter(field => selectedFields[field]);
 
@@ -284,6 +285,7 @@ const EmployeeManagement = () => {
                         onChange={handleImportExcel}
                         className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded"
                     />
+
 
                 </div>
                 <div>
