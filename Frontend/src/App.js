@@ -7,6 +7,7 @@ import Welcome from './features/auth/Welcome';
 import EmployeeList from './features/employee/EmployeeList';
 import UsersL from './features/users/users'; // Adjusted import path
 import Profile from './components/Profile';
+import Pointage from './components/Pointage';
 import EmployeeManagement from './components/EmployeeManagement'; // Import EmployeeManagement component
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
           <Route path="employees" element={<EmployeeManagement />} /> {/* New route for EmployeeManagement */}
           <Route path="users" element={<UsersL />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="pointage" element={<Pointage />}/>
         </Route>
       </Route>
     </Routes>

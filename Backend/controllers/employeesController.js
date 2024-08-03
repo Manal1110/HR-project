@@ -60,3 +60,15 @@ exports.deleteEmployee = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+
+// Import employees from Excel
+exports.importEmployees = async (req, res) => {
+    try {
+        const { employees } = req.body;
+        await Employee.insertMany(employees);
+        res.status(201).json({ message: 'Employees imported successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

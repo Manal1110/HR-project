@@ -11,4 +11,7 @@ router.route('/:id')
     .patch(employeesController.updateEmployee)
     .delete(employeesController.deleteEmployee);
 
+
+
+router.post('/import', employeesController.importEmployees);
 module.exports = router;
