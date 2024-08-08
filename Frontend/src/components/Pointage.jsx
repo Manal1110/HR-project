@@ -1,4 +1,3 @@
-// src/components/Pointage.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -20,17 +19,34 @@ const Pointage = () => {
     MOTIF: ''
   });
   const [editing, setEditing] = useState(null);
-  const [showForm, setShowForm] = useState(false); // New state for form visibility
+  const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState('');
+  const [selectedFields, setSelectedFields] = useState({
+    DATE: true,
+    MATRICULE: true,
+    NOM: true,
+    PRENOM: true,
+    UNITE: true,
+    TYPE: true,
+    SERVICE: true,
+    ENTREE: true,
+    SORTIE: true,
+    HN: true,
+    MOTIF: true
+  });
+  const [showChoices, setShowChoices] = useState(false); // New state for choices menu visibility
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     fetchPointages();
-  }, []);
+  }, [refreshKey]);
 
   const fetchPointages = async () => {
     try {
       const response = await axios.get('http://localhost:3500/pointage');
       setPointages(response.data);
     } catch (error) {
+      setError('Error fetching pointages');
       console.error('Error fetching pointages:', error);
     }
   };
@@ -42,12 +58,15 @@ const Pointage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const formattedDate = form.DATE.split('/').reverse().join('-'); // Convert DD/MM/YYYY to YYYY-MM-DD
+      const data = { ...form, DATE: formattedDate };
       if (editing) {
-        await axios.patch(`http://localhost:3500/pointage/${editing}`, form);
+        await axios.patch(`http://localhost:3500/pointage/${editing}`, data);
       } else {
-        await axios.post('http://localhost:3500/pointage', form);
+        await axios.post('http://localhost:3500/pointage', data);
       }
       fetchPointages();
+      window.location.reload();
       setForm({
         DATE: '',
         MATRICULE: '',
@@ -62,8 +81,10 @@ const Pointage = () => {
         MOTIF: ''
       });
       setEditing(null);
-      setShowForm(false); // Hide the form after submission
+      setShowForm(false);
+      setError('');
     } catch (error) {
+      setError('Error saving pointage');
       console.error('Error saving pointage:', error);
     }
   };
@@ -71,7 +92,7 @@ const Pointage = () => {
   const handleEdit = (pointage) => {
     setForm(pointage);
     setEditing(pointage._id);
-    setShowForm(true); // Show the form when editing
+    setShowForm(true);
   };
 
   const handleDelete = async (id) => {
@@ -84,17 +105,52 @@ const Pointage = () => {
   };
 
   const toggleForm = () => {
-    setShowForm(!showForm); // Toggle form visibility
-    setEditing(null); // Reset editing state when showing form
+    setShowForm(!showForm);
+    setEditing(null);
+  };
+
+  const handleFieldChange = (e) => {
+    setSelectedFields({ ...selectedFields, [e.target.name]: e.target.checked });
   };
 
   const exportToExcel = () => {
-    const filteredData = pointages.map(({ _id, __v, ...rest }) => rest);
+    const filteredData = pointages.map((pointage) =>
+      Object.keys(pointage).reduce((acc, key) => {
+        if (selectedFields[key] && key !== '_id' && key !== '__v') {
+          acc[key] = pointage[key];
+        }
+        return acc;
+      }, {})
+    );
     const ws = XLSX.utils.json_to_sheet(filteredData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Pointages');
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'pointages.xlsx');
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      await axios.post('http://localhost:3500/pointage/import', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setRefreshKey(prevKey => prevKey + 1);
+    } catch (error) {
+      setError('Error importing pointages');
+      console.error('Error importing pointages:', error);
+    }
+  };
+
+  const formatDate = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const styles = {
@@ -148,6 +204,14 @@ const Pointage = () => {
     formContainer: {
       display: showForm ? 'block' : 'none',
     },
+    choicesContainer: {
+      display: showChoices ? 'block' : 'none',
+      position: 'absolute',
+      backgroundColor: '#fff',
+      border: '1px solid #ddd',
+      padding: '10px',
+      zIndex: 1000,
+    },
   };
 
   return (
@@ -157,9 +221,33 @@ const Pointage = () => {
         {showForm ? 'Cancel' : 'Add Pointage'}
       </button>
 
-      <button onClick={exportToExcel} style={{ ...styles.button, marginTop: '10px' }}>
-        Export to Excel
-      </button>
+      <div style={{ position: 'relative' }}>
+        <button onClick={() => setShowChoices(!showChoices)} style={{ ...styles.button, marginTop: '10px' }}>
+          {showChoices ? 'Hide Export Options' : 'Show Export Options'}
+        </button>
+        <div style={styles.choicesContainer}>
+          {Object.keys(selectedFields).map((field) => (
+            <div key={field}>
+              <label>
+                <input
+                  type="checkbox"
+                  name={field}
+                  checked={selectedFields[field]}
+                  onChange={handleFieldChange}
+                />
+                {field}
+              </label>
+            </div>
+          ))}
+          <button onClick={exportToExcel} style={{ ...styles.button, marginTop: '10px' }}>
+            Export to Excel
+          </button>
+        </div>
+      </div>
+
+      <input type="file" onChange={handleFileUpload} />
+
+      {error && <p style={styles.error}>{error}</p>} {/* Display error messages */}
 
       <div style={styles.formContainer}>
         <form onSubmit={handleSubmit} style={styles.form}>
@@ -191,7 +279,7 @@ const Pointage = () => {
             type="text"
             name="PRENOM"
             value={form.PRENOM}
-            onChange={handleChange}
+            onChange={handleChange}            
             placeholder="PRENOM"
             style={styles.input}
           />
@@ -252,10 +340,11 @@ const Pointage = () => {
             style={styles.input}
           />
           <button type="submit" style={styles.button}>
-            {editing ? 'Update' : 'Add'} Pointage
+            {editing ? 'Update Pointage' : 'Add Pointage'}
           </button>
         </form>
       </div>
+
       <table style={styles.table}>
         <thead>
           <tr>
@@ -275,8 +364,8 @@ const Pointage = () => {
         </thead>
         <tbody>
           {pointages.map((pointage) => (
-            <tr key={pointage._id} style={styles.tr}>
-              <td style={styles.td}>{pointage.DATE}</td>
+            <tr key={pointage._id}>
+              <td style={styles.td}>{formatDate(pointage.DATE)}</td>
               <td style={styles.td}>{pointage.MATRICULE}</td>
               <td style={styles.td}>{pointage.NOM}</td>
               <td style={styles.td}>{pointage.PRENOM}</td>
@@ -304,3 +393,4 @@ const Pointage = () => {
 };
 
 export default Pointage;
+

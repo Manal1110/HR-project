@@ -34,6 +34,7 @@ app.use('/users', require('./routes/userRoutes'));
 app.use('/employees', require('./routes/employeeRoutes'));
 app.use('/pointage', require('./routes/pointage'));
 
+
 app.all('*', (req, res) => {
   res.status(404);
   if (req.accepts('html')) {
