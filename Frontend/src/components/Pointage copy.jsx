@@ -2,33 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { Bar, Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import html2canvas from 'html2canvas';
 import './Pointage.css';
-import ExcelJS from 'exceljs';
 
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  PointElement
-} from 'chart.js';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  PointElement 
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Pointage = () => {
   const [pointages, setPointages] = useState([]);
@@ -201,42 +180,106 @@ const Pointage = () => {
   const analyzeData = async () => {
     try {
       const response = await axios.post('http://localhost:3500/pointage/analyze', {
-        start: analysisPeriod.start,
-        end: analysisPeriod.end,
-        motifs: selectedMotifs
+        motifs: selectedMotifs,
+        period: analysisPeriod
       });
-      setAnalysisData(response.data);
+  
+      const data = response.data;
+      const totalsByDate = {};
+  
+      const startDate = new Date(analysisPeriod.start);
+      const endDate = new Date(analysisPeriod.end);
+  
+      data.forEach(item => {
+        const rawDate = item.DATE;
+        if (!rawDate) {
+          console.warn('Missing DATE field:', item);
+          return; // Skip this item if DATE is missing
+        }
+  
+        const date = new Date(rawDate);
+        if (isNaN(date.getTime())) {
+          console.warn('Invalid DATE value:', rawDate);
+          return; // Skip this item if DATE is invalid
+        }
+  
+        const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD
+  
+        if (date >= startDate && date <= endDate) {
+          if (!totalsByDate[formattedDate]) {
+            totalsByDate[formattedDate] = {};
+          }
+  
+          if (!totalsByDate[formattedDate][item.MOTIF]) {
+            totalsByDate[formattedDate][item.MOTIF] = 0;
+          }
+  
+          if (item.MOTIF && selectedMotifs.includes(item.MOTIF)) {
+            totalsByDate[formattedDate][item.MOTIF] += 1;
+          }
+        }
+      });
+  
+      const labels = Object.keys(totalsByDate).sort(); // Dates for x-axis
+      const datasets = selectedMotifs.map(motif => ({
+        label: motif,
+        data: labels.map(date => totalsByDate[date][motif] || 0),
+        backgroundColor: getRandomColor(), // Random color for each motif
+      }));
+  
+      setAnalysisData({
+        labels,
+        datasets
+      });
+  
       setShowAnalysis(true);
     } catch (error) {
       setError('Error analyzing data');
       console.error('Error analyzing data:', error);
     }
   };
+  
+  
+  // Optional: Function to generate random colors for each dataset
+  const getRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+  
+  
+  
+  
+  
   const exportAnalysisToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(analysisData.datasets[0].data.map((value, index) => ({
-      Date: analysisData.labels[index],
-      Total: value
-    })));
+    const ws = XLSX.utils.json_to_sheet(
+      analysisData.labels.map((label, index) => ({
+        Period: label,
+        Total: analysisData.datasets[0].data[index]
+      }))
+    );
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Analysis');
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'analysis.xlsx');
   };
-  
 
-  const downloadChart = () => {
+  const exportChartAsImage = () => {
     if (chartRef.current) {
-      html2canvas(chartRef.current.canvas.parentNode).then((canvas) => {
+      html2canvas(chartRef.current).then(canvas => {
+        const img = canvas.toDataURL('image/png');
         const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
+        link.href = img;
         link.download = 'chart.png';
         link.click();
-      }).catch((error) => {
-        console.error('Error downloading chart:', error);
       });
     }
   };
- 
+
+
 
   return (
     <div className="container">
@@ -322,81 +365,58 @@ const Pointage = () => {
       </button>
       {showAnalysis && (
         <div className="chartContainer">
-          <Bar
-            data={{
-              labels: analysisData.labels,
-              datasets: [
-                {
-                  type: 'bar',
-                  label: 'Totals',
-                  data: analysisData.datasets[0].data,
-                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                  borderColor: 'rgba(75, 192, 192, 1)',
-                  borderWidth: 1,
-                },
-                {
-                  type: 'line',
-                  label: 'Trend',
-                  data: analysisData.datasets[1]?.data || [],
-                  borderColor: 'rgba(255, 99, 132, 1)',
-                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                  fill: false,
-                  tension: 0.1,
-                },
-              ],
-            }}
-            ref={chartRef}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: 'top',
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function(context) {
-                      let label = context.dataset.label || '';
-                      if (label) {
-                        label += ': ';
-                      }
-                      if (context.parsed.y !== null) {
-                        label += context.parsed.y;
-                      }
-                      return label;
-                    }
-                  }
-                }
-              },
-              scales: {
-                x: {
-                  title: {
-                    display: true,
-                    text: 'Date'
-                  },
-                  ticks: {
-                    autoSkip: true,
-                    maxRotation: 45,
-                  }
-                },
-                y: {
-                  title: {
-                    display: true,
-                    text: 'Total'
-                  }
-                }
-              }
-            }}
-          />
+<Bar
+  data={analysisData}
+  ref={chartRef}
+  options={{
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.y !== null) {
+              label += context.parsed.y;
+            }
+            return label;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Date'
+        },
+        ticks: {
+          autoSkip: true, // Automatically skip labels to avoid overlap
+          maxRotation: 45, // Rotate labels for better readability
+        }
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Total'
+        }
+      }
+    }
+  }}
+/>
+
 
           <button onClick={exportAnalysisToExcel} className="exportButton">
             Export Analysis to Excel
           </button>
-          <button onClick={downloadChart} className="button">
-  Download Chart
-</button>
-
-
-
+          <button onClick={exportChartAsImage} className="exportButton">
+            Export Chart as Image
+          </button>
         </div>
       )}
 
