@@ -33,7 +33,7 @@ app.use('/auth', require('./routes/authRoutes'));
 app.use('/users', require('./routes/userRoutes'));
 app.use('/employees', require('./routes/employeeRoutes'));
 app.use('/pointage', require('./routes/pointage'));
-
+app.use('/gender', require('./routes/genderRoutes'));
 
 app.all('*', (req, res) => {
   res.status(404);

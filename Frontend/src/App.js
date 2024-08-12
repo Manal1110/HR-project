@@ -9,6 +9,8 @@ import UsersL from './features/users/users'; // Adjusted import path
 import Profile from './components/Profile';
 import Pointage from './components/Pointage';
 import EmployeeManagement from './components/EmployeeManagement'; // Import EmployeeManagement component
+import GenderStatistics from './components/GenderStatistics'; // Import GenderStatistics component
+
 
 function App() {
   return (
@@ -24,6 +26,9 @@ function App() {
           <Route path="users" element={<UsersL />} />
           <Route path="profile" element={<Profile />} />
           <Route path="pointage" element={<Pointage />}/>
+          <Route path="Dashboard-Total" element={<GenderStatistics />} /> {/* New route for GenderStatistics */}
+
+
         </Route>
       </Route>
     </Routes>
