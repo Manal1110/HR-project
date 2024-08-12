@@ -278,20 +278,19 @@ const EmployeeManagement = () => {
                     <button onClick={handleDownloadExcel} className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded">
                         Download Excel
                     </button>
-
-                    <input
-                        type="file"
-                        accept=".xlsx, .xls"
-                        onChange={handleImportExcel}
-                        className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded"
-                    />
-
-
-                </div>
-                <div>
-                    <button onClick={openModal} className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded">
+                    <button onClick={openModal} className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded mx-4">
                         Add New Employee
                     </button>
+                    
+                </div>
+                <div>
+                    <input
+                            type="file"
+                            accept=".xlsx, .xls"
+                            onChange={handleImportExcel}
+                            className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded mx-4"
+                        />
+                        
                 </div>
             </div>
 
