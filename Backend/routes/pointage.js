@@ -14,7 +14,10 @@ router.route('/:id')
     .patch(pointageController.updatePointage)
     .delete(pointageController.deletePointage);
 
-// Route for importing Excel file
+
 router.post('/import', upload.single('file'), pointageController.importPointages);
+
+
+router.post('/analyze', pointageController.analyzePointages);
 
 module.exports = router;

@@ -1,0 +1,109 @@
+
+.container {
+    font-family: 'Arial, sans-serif';
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .input {
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  .button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .buttonDanger {
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: none;
+    background-color: #dc3545;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .chartContainer {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .exportButton {
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+  
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+  }
+  
+  table thead {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  table th, table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  table tr:hover {
+    background-color: #ddd;
+  }
+  
+  table th {
+    font-weight: bold;
+  }
+  
+  table td {
+    font-size: 14px;
+  }
+  
+  .tableContainer {
+    overflow-x: auto;
+  }
+  
+  .tableHeader {
+    margin-bottom: 10px;
+  }
+  
+  .tableActions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .tableActions button {
+    margin: 0;
+  }
+  

@@ -1,18 +1,116 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import Modal from 'react-modal';
-import HashLoader from 'react-spinners/HashLoader';
-import PointageForm from './PointageForm'; // Updated import
-import PointageTable from './PointageTable'; // Import the PointageTable component
 
-// Set the root element for accessibility
-Modal.setAppElement('#root');
+import { Bar, Line } from 'react-chartjs-2';
+import html2canvas from 'html2canvas';
+import './Pointage.css';
+import ExcelJS from 'exceljs';
+
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  PointElement
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  PointElement 
+);
 
 const Pointage = () => {
-    const [pointages, setPointages] = useState([]);
-    const [form, setForm] = useState({
+  const [pointages, setPointages] = useState([]);
+  
+  const [form, setForm] = useState({
+    DATE: '',
+    MATRICULE: '',
+    NOM: '',
+    PRENOM: '',
+    UNITE: '',
+    TYPE: '',
+    SERVICE: '',
+    ENTREE: '',
+    SORTIE: '',
+    HN: '',
+    MOTIF: ''
+  });
+  const [editing, setEditing] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState('');
+  const [selectedFields, setSelectedFields] = useState({
+    DATE: true,
+    MATRICULE: true,
+    NOM: true,
+    PRENOM: true,
+    UNITE: true,
+    TYPE: true,
+    SERVICE: true,
+    ENTREE: true,
+    SORTIE: true,
+    HN: true,
+    MOTIF: true
+  });
+  const [showChoices, setShowChoices] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedMotifs, setSelectedMotifs] = useState([]);
+  const [analysisPeriod, setAnalysisPeriod] = useState({ start: '', end: '' });
+  const [analysisData, setAnalysisData] = useState([]);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    fetchPointages();
+  }, [refreshKey]);
+
+  const fetchPointages = async () => {
+    try {
+      const response = await axios.get('http://localhost:3500/pointage');
+      console.log('Fetched pointages data:', response.data);
+      setPointages(response.data);
+    } catch (error) {
+      setError('Error fetching pointages');
+      console.error('Error fetching pointages:', error);
+    }
+  };
+  
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formattedDate = form.DATE.split('/').reverse().join('-');
+      const data = {
+        ...form,
+        DATE: formattedDate,
+        ENTREE: form.ENTREE,
+        SORTIE: form.SORTIE,
+      };
+
+      if (editing) {
+        await axios.patch(`http://localhost:3500/pointage/${editing}`, data);
+      } else {
+        await axios.post('http://localhost:3500/pointage', data);
+      }
+
+      fetchPointages();
+      setRefreshKey(prevKey => prevKey + 1);
+      setForm({
         DATE: '',
         MATRICULE: '',
         NOM: '',
@@ -174,81 +272,254 @@ const Pointage = () => {
         );
     }
 
-    return (
-        <div className="max-w-screen overflow-x-hidden mx-auto px-4 py-8 font-playfair">
-            <h1 className="text-2xl font-bold mb-4">Pointage Management</h1>
-            <div className="flex items-center space-x-4 mb-4">
-                <button
-                    onClick={openModal}
-                    className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded"
-                >
-                    {editing ? 'Cancel' : 'Add Pointage'}
-                </button>
+  };
 
-                <div className="relative">
-                    <button
-                        onClick={() => setShowChoices(!showChoices)}
-                        className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded"
-                    >
-                        {showChoices ? 'Hide Export Options' : 'Show Export Options'}
-                    </button>
-                    {showChoices && (
-                        <div className="absolute bg-white border border-gray-200 p-4 mt-2 shadow-lg rounded">
-                            {Object.keys(selectedFields).map((field) => (
-                                <div key={field}>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name={field}
-                                            checked={selectedFields[field]}
-                                            onChange={handleFieldChange}
-                                        />
-                                        {field}
-                                    </label>
-                                </div>
-                            ))}
-                            <button
-                                onClick={exportToExcel}
-                                className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded"
-                            >
-                                Export to Excel
-                            </button>
-                        </div>
-                    )}
-                </div>
+  const handlePeriodChange = (e) => {
+    const { name, value } = e.target;
+    setAnalysisPeriod(prev => ({ ...prev, [name]: value }));
+  };
 
-                <input
-                    type="file"
-                    onChange={handleFileUpload}
-                    className="bg-darkpurple hover:bg-hoverpurple text-white px-4 py-2 rounded"
-                />
-            </div>
-
-            {error && <p className="text-red-500 mb-4">{error}</p>} {/* Display error messages */}
-
-            <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={handleCloseModal}
-                contentLabel="Pointage Modal"
-                className="fixed inset-0 bg-white p-8 shadow-lg rounded"
-            >
-                <PointageForm
-                    formData={form}
-                    handleChange={handleChange}
-                    handleSubmit={handleSubmit}
-                    handleEditCancel={handleCloseModal}
-                    editMode={!!editing}
-                />
-            </Modal>
-
-            <PointageTable
-                filteredPointages={pointages}
-                selectedFields={selectedFields}
-                handleEditClick={handleEdit}
-                handleDelete={handleDelete}
-            />
-        </div>
+  const handleMotifChange = (e) => {
+    const { value, checked } = e.target;
+    setSelectedMotifs(prev =>
+      checked ? [...prev, value] : prev.filter(motif => motif !== value)
     );
+  };
+
+  const analyzeData = async () => {
+    try {
+      const response = await axios.post('http://localhost:3500/pointage/analyze', {
+        start: analysisPeriod.start,
+        end: analysisPeriod.end,
+        motifs: selectedMotifs
+      });
+      setAnalysisData(response.data);
+      setShowAnalysis(true);
+    } catch (error) {
+      setError('Error analyzing data');
+      console.error('Error analyzing data:', error);
+    }
+  };
+  const exportAnalysisToExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(analysisData.datasets[0].data.map((value, index) => ({
+      Date: analysisData.labels[index],
+      Total: value
+    })));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Analysis');
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'analysis.xlsx');
+  };
+  
+
+  const downloadChart = () => {
+    if (chartRef.current) {
+      html2canvas(chartRef.current.canvas.parentNode).then((canvas) => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = 'chart.png';
+        link.click();
+      }).catch((error) => {
+        console.error('Error downloading chart:', error);
+      });
+    }
+  };
+ 
+
+  return (
+    <div className="container">
+      <h1>Pointage Management</h1>
+      <button onClick={toggleForm} className="button">
+        {showForm ? 'Close Form' : 'Add New Pointage'}
+      </button>
+      {showForm && (
+        <form onSubmit={handleSubmit} className="form">
+          <input
+            type="text"
+            name="DATE"
+            value={form.DATE}
+            onChange={handleChange}
+            placeholder="Date (dd/mm/yyyy)"
+            className="input"
+            required
+          />
+          {/* Add other input fields here */}
+          <button type="submit" className="button">
+            {editing ? 'Update Pointage' : 'Add Pointage'}
+          </button>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+        </form>
+      )}
+      <button onClick={exportToExcel} className="button">
+        Export to Excel
+      </button>
+      <input type="file" onChange={handleFileUpload} />
+      <button onClick={() => setShowChoices(!showChoices)} className="button">
+        {showChoices ? 'Hide Choices' : 'Show Choices'}
+      </button>
+      {showChoices && (
+        <div>
+          {Object.keys(selectedFields).map((field) => (
+            <label key={field}>
+              <input
+                type="checkbox"
+                name={field}
+                checked={selectedFields[field]}
+                onChange={handleFieldChange}
+              />
+              {field}
+            </label>
+          ))}
+        </div>
+      )}
+      <h2>Analysis</h2>
+      <input
+        type="date"
+        name="start"
+        value={analysisPeriod.start}
+        onChange={handlePeriodChange}
+        placeholder="Start Date"
+      />
+      <input
+        type="date"
+        name="end"
+        value={analysisPeriod.end}
+        onChange={handlePeriodChange}
+        placeholder="End Date"
+      />
+      <select name="type" onChange={(e) => setAnalysisPeriod(prev => ({ ...prev, type: e.target.value }))}>
+        <option value="day">Daily</option>
+        <option value="week">Weekly</option>
+        <option value="month">Monthly</option>
+      </select>
+      <div>
+        {['CM', 'MAT', 'AUT', 'Récupération', 'CT', 'MIS', 'AT', 'ABSI', 'CG', 'CSS', 'FOR', 'MAR', '0'].map(motif => (
+          <label key={motif}>
+            <input
+              type="checkbox"
+              value={motif}
+              checked={selectedMotifs.includes(motif)}
+              onChange={handleMotifChange}
+            />
+            {motif}
+          </label>
+        ))}
+      </div>
+      <button onClick={analyzeData} className="button">
+        Analyze Data
+      </button>
+      {showAnalysis && (
+        <div className="chartContainer">
+          <Bar
+            data={{
+              labels: analysisData.labels,
+              datasets: [
+                {
+                  type: 'bar',
+                  label: 'Totals',
+                  data: analysisData.datasets[0].data,
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  borderWidth: 1,
+                },
+                {
+                  type: 'line',
+                  label: 'Trend',
+                  data: analysisData.datasets[1]?.data || [],
+                  borderColor: 'rgba(255, 99, 132, 1)',
+                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                  fill: false,
+                  tension: 0.1,
+                },
+              ],
+            }}
+            ref={chartRef}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'top',
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      let label = context.dataset.label || '';
+                      if (label) {
+                        label += ': ';
+                      }
+                      if (context.parsed.y !== null) {
+                        label += context.parsed.y;
+                      }
+                      return label;
+                    }
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Date'
+                  },
+                  ticks: {
+                    autoSkip: true,
+                    maxRotation: 45,
+                  }
+                },
+                y: {
+                  title: {
+                    display: true,
+                    text: 'Total'
+                  }
+                }
+              }
+            }}
+          />
+
+          <button onClick={exportAnalysisToExcel} className="exportButton">
+            Export Analysis to Excel
+          </button>
+          <button onClick={downloadChart} className="button">
+  Download Chart
+</button>
+
+
+
+        </div>
+      )}
+
+      {pointages.length > 0 && (
+        <table>
+          <thead>
+            <tr>
+              {Object.keys(pointages[0]).map((key) => (
+                selectedFields[key] && key !== '_id' && key !== '__v' && <th key={key}>{key}</th>
+              ))}
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pointages.map((pointage) => (
+              <tr key={pointage._id}>
+                {Object.keys(pointage).map((key) => (
+                  selectedFields[key] && key !== '_id' && key !== '__v' && <td key={key}>{pointage[key]}</td>
+                ))}
+                <td>
+                  <button onClick={() => handleEdit(pointage)} className="button">
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(pointage._id)} className="buttonDanger">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+
 };
 
 export default Pointage;

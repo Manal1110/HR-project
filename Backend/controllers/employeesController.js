@@ -72,3 +72,24 @@ exports.importEmployees = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+exports.getGenderStatistics = async (req, res) => {
+    try {
+        // Count the number of employees by gender
+        const maleCount = await Employee.countDocuments({ gender: 'Male' });
+        const femaleCount = await Employee.countDocuments({ gender: 'Female' });
+        const otherCount = await Employee.countDocuments({ gender: { $nin: ['Male', 'Female'] } });
+
+        // Prepare the response
+        const stats = {
+            maleCount,
+            femaleCount,
+            otherCount
+        };
+
+        res.json(stats);
+    } catch (err) {
+        console.error('Error in getGenderStatistics:', err);
+        res.status(500).json({ error: 'An error occurred while fetching gender statistics.' });
+    }
+};
