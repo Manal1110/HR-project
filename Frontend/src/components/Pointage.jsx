@@ -50,6 +50,7 @@ const Pointage = () => {
   const [editing, setEditing] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState('');
+
   const [selectedFields, setSelectedFields] = useState({
     DATE: true,
     MATRICULE: true,
@@ -70,6 +71,7 @@ const Pointage = () => {
   const [analysisData, setAnalysisData] = useState([]);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const chartRef = useRef(null);
+
 
   useEffect(() => {
     fetchPointages();
@@ -293,13 +295,21 @@ const Pointage = () => {
         end: analysisPeriod.end,
         motifs: selectedMotifs
       });
-      setAnalysisData(response.data);
+
+      const data = response.data;
+      console.log('Received Data:', data);
+
+      setAnalysisData(data);
       setShowAnalysis(true);
     } catch (error) {
       setError('Error analyzing data');
       console.error('Error analyzing data:', error);
     }
+
+    console.log('Selected Motifs:', selectedMotifs);
   };
+  
+  
   const exportAnalysisToExcel = () => {
     const ws = XLSX.utils.json_to_sheet(analysisData.datasets[0].data.map((value, index) => ({
       Date: analysisData.labels[index],
@@ -310,6 +320,22 @@ const Pointage = () => {
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'analysis.xlsx');
   };
+  const colors = [
+    'rgba(255, 99, 132, 0.2)', // Red
+    'rgba(54, 162, 235, 0.2)', // Blue
+    'rgba(255, 206, 86, 0.2)', // Yellow
+    'rgba(75, 192, 192, 0.2)', // Green
+    'rgba(153, 102, 255, 0.2)', // Purple
+    'rgba(255, 159, 64, 0.2)', // Orange
+    'rgba(199, 199, 199, 0.2)', // Light Gray
+    'rgba(83, 102, 255, 0.2)', // Dark Blue
+    'rgba(255, 0, 255, 0.2)', // Magenta
+    'rgba(0, 255, 255, 0.2)', // Cyan
+    'rgba(128, 0, 128, 0.2)', // Purple
+    'rgba(0, 128, 128, 0.2)', // Teal
+    'rgba(255, 165, 0, 0.2)'  // Orange
+  ];
+
   
 
   const downloadChart = () => {
@@ -325,6 +351,7 @@ const Pointage = () => {
     }
   };
  
+  
 
   return (
     <div className="container">
@@ -408,85 +435,77 @@ const Pointage = () => {
       <button onClick={analyzeData} className="button">
         Analyze Data
       </button>
+     
       {showAnalysis && (
         <div className="chartContainer">
-          <Bar
-            data={{
-              labels: analysisData.labels,
-              datasets: [
-                {
-                  type: 'bar',
-                  label: 'Totals',
-                  data: analysisData.datasets[0].data,
-                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                  borderColor: 'rgba(75, 192, 192, 1)',
-                  borderWidth: 1,
-                },
-                {
-                  type: 'line',
-                  label: 'Trend',
-                  data: analysisData.datasets[1]?.data || [],
-                  borderColor: 'rgba(255, 99, 132, 1)',
-                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                  fill: false,
-                  tension: 0.1,
-                },
-              ],
-            }}
-            ref={chartRef}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: 'top',
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function(context) {
-                      let label = context.dataset.label || '';
-                      if (label) {
-                        label += ': ';
-                      }
-                      if (context.parsed.y !== null) {
-                        label += context.parsed.y;
-                      }
-                      return label;
-                    }
-                  }
-                }
-              },
-              scales: {
-                x: {
-                  title: {
-                    display: true,
-                    text: 'Date'
-                  },
-                  ticks: {
-                    autoSkip: true,
-                    maxRotation: 45,
-                  }
-                },
-                y: {
-                  title: {
-                    display: true,
-                    text: 'Total'
-                  }
-                }
-              }
-            }}
-          />
+
+
+<Bar
+  data={{
+    labels: analysisData.labels,
+    datasets: analysisData.datasets.map((dataset, index) => ({
+      ...dataset,
+      backgroundColor: colors[index % colors.length],
+      borderColor: colors[index % colors.length].replace('0.2', '1'), // Adjust border color to be fully opaque
+      borderWidth: 1,
+    })),
+  }}
+  ref={chartRef}
+  options={{
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.y !== null) {
+              label += context.parsed.y;
+            }
+            return label;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        stacked: true,
+        title: {
+          display: true,
+          text: 'Date'
+        },
+        ticks: {
+          autoSkip: true,
+          maxRotation: 45,
+        }
+      },
+      y: {
+        stacked: true,
+        title: {
+          display: true,
+          text: 'Total'
+        }
+      }
+    }
+  }}
+/>
+
 
           <button onClick={exportAnalysisToExcel} className="exportButton">
             Export Analysis to Excel
           </button>
           <button onClick={downloadChart} className="button">
-  Download Chart
-</button>
-
-
-
+            Download Chart
+          </button>
         </div>
-      )}
+      
+)}
+
 
       {pointages.length > 0 && (
         <table>

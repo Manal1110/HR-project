@@ -155,14 +155,16 @@ const analyzePointages = async (req, res) => {
   try {
     const { start, end, motifs } = req.body;
 
-    // Convert start and end dates to YYYY-MM-DD format
+    if (!start || !end || !Array.isArray(motifs)) {
+      return res.status(400).json({ message: 'Invalid input' });
+    }
+
     const startDate = new Date(start);
     const endDate = new Date(end);
     endDate.setDate(endDate.getDate() + 1); // Inclusive end date
 
-    // Fetch pointages within the selected period
     const pointages = await Pointage.find({
-      DATE: { $gte: startDate.toISOString().split('T')[0], $lt: endDate.toISOString().split('T')[0] }
+      DATE: { $gte: startDate, $lt: endDate }
     });
 
     // Filter by selected motifs
@@ -173,28 +175,49 @@ const analyzePointages = async (req, res) => {
     filteredPointages.forEach(pointage => {
       const date = pointage.DATE.toISOString().split('T')[0];
       if (!analysisData[date]) {
-        analysisData[date] = 0;
+        analysisData[date] = { total: 0, motifs: {} };
       }
-      analysisData[date]++;
+      analysisData[date].total++;
+      analysisData[date].motifs[pointage.MOTIF] = (analysisData[date].motifs[pointage.MOTIF] || 0) + 1;
     });
 
     // Prepare data for chart
     const labels = Object.keys(analysisData);
-    const data = Object.values(analysisData);
+    const totals = labels.map(date => analysisData[date].total);
+    const datasets = motifs.map(motif => ({
+      label: motif,
+      data: labels.map(date => analysisData[date].motifs[motif] || 0),
+      backgroundColor: generateColor(motif), // Function to generate a color for each motif
+      stack: 'stack0',
+    }));
 
     res.json({
       labels,
-      datasets: [{
-        label: 'Pointages by Date',
-        data,
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1
-      }]
+      datasets: [
+        {
+          label: 'Total',
+          data: totals,
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1,
+        },
+        ...datasets,
+      ]
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Error analyzing data:', err);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
+};
+
+// Helper function to generate colors for motifs
+const generateColor = (motif) => {
+  const colors = {
+    CM: 'rgba(255, 99, 132, 0.2)',
+    MAT: 'rgba(54, 162, 235, 0.2)',
+    // Add more colors for each motif
+  };
+  return colors[motif] || 'rgba(255, 159, 64, 0.2)'; // Default color
 };
 
 
