@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-
 import { Bar, Line } from 'react-chartjs-2';
 import html2canvas from 'html2canvas';
 import './Pointage.css';
@@ -122,156 +121,69 @@ const Pointage = () => {
         SORTIE: '',
         HN: '',
         MOTIF: ''
-    });
-    const [editing, setEditing] = useState(null);
-    const [showForm, setShowForm] = useState(false);
-    const [error, setError] = useState('');
-    const [selectedFields, setSelectedFields] = useState({
-        DATE: true,
-        MATRICULE: true,
-        NOM: true,
-        PRENOM: true,
-        UNITE: true,
-        TYPE: true,
-        SERVICE: true,
-        ENTREE: true,
-        SORTIE: true,
-        HN: true,
-        MOTIF: true
-    });
-    const [showChoices, setShowChoices] = useState(false);
-    const [refreshKey, setRefreshKey] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-
-    useEffect(() => {
-        setLoading(true);
-        fetchPointages();
-    }, [refreshKey]);
-
-    const fetchPointages = async () => {
-        try {
-            const response = await axios.get('http://localhost:3500/pointage');
-            setPointages(response.data);
-        } catch (error) {
-            setError('Error fetching pointages');
-            console.error('Error fetching pointages:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const formattedDate = form.DATE.split('/').reverse().join('-'); // Convert DD/MM/YYYY to YYYY-MM-DD
-            const data = { ...form, DATE: formattedDate };
-            if (editing) {
-                await axios.patch(`http://localhost:3500/pointage/${editing}`, data);
-            } else {
-                await axios.post('http://localhost:3500/pointage', data);
-            }
-            fetchPointages();
-            handleCloseModal();
-        } catch (error) {
-            setError('Error saving pointage');
-            console.error('Error saving pointage:', error);
-        }
-    };
-
-    const handleEdit = (pointage) => {
-        setForm(pointage);
-        setEditing(pointage._id);
-        openModal();
-    };
-
-    const handleDelete = async (id) => {
-        try {
-            await axios.delete(`http://localhost:3500/pointage/${id}`);
-            fetchPointages();
-        } catch (error) {
-            console.error('Error deleting pointage:', error);
-        }
-    };
-
-    const openModal = () => {
-        setModalIsOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setModalIsOpen(false);
-        setEditing(null);
-        setForm({
-            DATE: '',
-            MATRICULE: '',
-            NOM: '',
-            PRENOM: '',
-            UNITE: '',
-            TYPE: '',
-            SERVICE: '',
-            ENTREE: '',
-            SORTIE: '',
-            HN: '',
-            MOTIF: ''
-        });
-    };
-
-    const handleFieldChange = (e) => {
-        setSelectedFields({ ...selectedFields, [e.target.name]: e.target.checked });
-    };
-
-    const exportToExcel = () => {
-        const filteredData = pointages.map((pointage) =>
-            Object.keys(pointage).reduce((acc, key) => {
-                if (selectedFields[key] && key !== '_id' && key !== '__v') {
-                    acc[key] = pointage[key];
-                }
-                return acc;
-            }, {})
-        );
-        const ws = XLSX.utils.json_to_sheet(filteredData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Pointages');
-        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-        saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'pointages.xlsx');
-    };
-
-    const handleFileUpload = async (e) => {
-        const file = e.target.files[0];
-        const formData = new FormData();
-        formData.append('file', file);
-        try {
-            await axios.post('http://localhost:3500/pointage/import', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            setRefreshKey(prevKey => prevKey + 1);
-        } catch (error) {
-            setError('Error importing pointages');
-            console.error('Error importing pointages:', error);
-        }
-    };
-
-    const formatDate = (date) => {
-        if (!date) return '';
-        const d = new Date(date);
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const year = d.getFullYear();
-        return `${day}/${month}/${year}`;
-    };
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <HashLoader size={100} color={"#123abc"} />
-            </div>
-        );
+      });
+      setEditing(null);
+      setShowForm(false);
+      setError('');
+    } catch (error) {
+      setError('Error saving pointage');
+      console.error('Error saving pointage:', error);
     }
+  };
 
+  const handleEdit = (pointage) => {
+    setForm(pointage);
+    setEditing(pointage._id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3500/pointage/${id}`);
+      fetchPointages();
+    } catch (error) {
+      console.error('Error deleting pointage:', error);
+    }
+  };
+
+  const toggleForm = () => {
+    setShowForm(!showForm);
+    setEditing(null);
+  };
+
+  const handleFieldChange = (e) => {
+    setSelectedFields({ ...selectedFields, [e.target.name]: e.target.checked });
+  };
+
+  const exportToExcel = () => {
+    const filteredData = pointages.map((pointage) =>
+      Object.keys(pointage).reduce((acc, key) => {
+        if (selectedFields[key] && key !== '_id' && key !== '__v') {
+          acc[key] = pointage[key];
+        }
+        return acc;
+      }, {})
+    );
+    const ws = XLSX.utils.json_to_sheet(filteredData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Pointages');
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'pointages.xlsx');
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      await axios.post('http://localhost:3500/pointage/import', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setRefreshKey(prevKey => prevKey + 1);
+    } catch (error) {
+      setError('Error importing pointages');
+      console.error('Error importing pointages:', error);
+    }
   };
 
   const handlePeriodChange = (e) => {
@@ -519,7 +431,6 @@ const Pointage = () => {
       )}
     </div>
   );
-
 };
 
 export default Pointage;
