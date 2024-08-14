@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import './ImportEmployees.css'; // Import external CSS for additional styling
+import './ImportEmployeescombu.css'; // Import external CSS for additional styling
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const ImportEmployees = () => {
+const ImportEmployeescombu = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,7 +37,7 @@ const ImportEmployees = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:3500/employeeshub/import', formData, {
+      const response = await axios.post('http://localhost:3500/employeescombu/import', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -55,7 +55,7 @@ const ImportEmployees = () => {
   const fetchStatistics = async () => {
     try {
       // Fetch employee data
-      const employeesResponse = await axios.get('http://localhost:3500/employeeshub');
+      const employeesResponse = await axios.get('http://localhost:3500/employeescombu');
       const employees = employeesResponse.data;
 
       if (employees.length === 0) {
@@ -95,6 +95,7 @@ const ImportEmployees = () => {
         count,
       })));
 
+
       // Calculate service data
       const services = {};
       employees.forEach(emp => {
@@ -106,9 +107,8 @@ const ImportEmployees = () => {
         count,
       })));
 
-
       // Fetch statistics data
-      const statisticsResponse = await axios.get('http://localhost:3500/statisticsHub');
+      const statisticsResponse = await axios.get('http://localhost:3500/statisticsCombu');
       const statistics = statisticsResponse.data;
 
       if (statistics.length === 0) {
@@ -126,7 +126,7 @@ const ImportEmployees = () => {
   const handleAddStat = async (event) => {
     event.preventDefault();
     try {
-      await axios.post('http://localhost:3500/statisticsHub', newStat);
+      await axios.post('http://localhost:3500/statisticsCombu', newStat);
       setMessage('Statistics added successfully.');
       setNewStat({ year: '', month: '', absenteeism: '', overtime: '', turnover: '' });
       fetchStatistics(); // Refresh statistics data
@@ -139,7 +139,7 @@ const ImportEmployees = () => {
     event.preventDefault();
     try {
       if (!editStat) return;
-      await axios.put(`http://localhost:3500/statisticsHub/${editStat._id}`, editStat);
+      await axios.put(`http://localhost:3500/statisticsCombu/${editStat._id}`, editStat);
       setMessage('Statistics updated successfully.');
       setEditStat(null);
       fetchStatistics(); // Refresh statistics data
@@ -195,6 +195,7 @@ const ImportEmployees = () => {
       },
     ],
   };
+
 
   return (
     <div className="import-employees">
@@ -263,7 +264,7 @@ const ImportEmployees = () => {
             }
           }} />
         </div>
-
+        
         <div className="statistics-data">
           <h3>Statistics Overview</h3>
           <form onSubmit={editStat ? handleUpdateStat : handleAddStat} className="stats-form">
@@ -333,4 +334,4 @@ const ImportEmployees = () => {
   );
 };
 
-export default ImportEmployees;
+export default ImportEmployeescombu;
