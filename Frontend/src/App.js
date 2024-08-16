@@ -10,6 +10,9 @@ import Profile from './components/Profile';
 import Pointage from './components/Pointage';
 import EmployeeManagement from './components/EmployeeManagement'; // Import EmployeeManagement component
 import GenderStatistics from './components/GenderStatistics'; // Import GenderStatistics component
+import ImportEmployeeshub from './components/ImportEmployeeshub';
+import ImportEmployeescombu from './components/ImportEmployeescombu';
+import ImportEmployeeshc from './components/ImportEmployeeshc';
 
 
 function App() {
@@ -26,7 +29,10 @@ function App() {
           <Route path="users" element={<UsersL />} />
           <Route path="profile" element={<Profile />} />
           <Route path="pointage" element={<Pointage />}/>
-          <Route path="Dashboard-Total" element={<GenderStatistics />} /> {/* New route for GenderStatistics */}
+          <Route path="Dashboard-HUB" element={<ImportEmployeeshub />} /> 
+          <Route path="Dashboard-COMBU" element={<ImportEmployeescombu />} /> 
+          <Route path="Dashboard-TOTAL" element={<ImportEmployeeshc />} /> 
+
 
 
         </Route>

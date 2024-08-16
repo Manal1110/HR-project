@@ -24,13 +24,14 @@ const NavBar = () => {
                 </div>
             </div>
             <nav className="flex flex-col p-12 pl-8 space-y-8">
-                <NavLink to="/dash/Dashboard-Total" label="Dashboard Total" icon="fas fa-home" />
-                <NavLink to="/dash" label="Dashboard Combu" icon="fas fa-chart-bar" />
-                <NavLink to="/dash" label="Dashboard Hub" icon="fas fa-th" />
+                <NavLink to="/dash/Dashboard-TOTAL" label="Dashboard Total" icon="fas fa-home" />
+                <NavLink to="/dash/Dashboard-COMBU" label="Dashboard Combu" icon="fas fa-home" />
+                <NavLink to="/dash/Dashboard-HUB" label="Dashboard Hub" icon="fas fa-home" />
                 <NavLink to="/dash/employees" label="Employees" icon="fas fa-users" />
                 <NavLink to="/dash/pointage" label="Check-In/Out" icon="fas fa-clock" />
                 <NavLink to="/dash/profile" label="Profile" icon="fas fa-user" />
                 <NavLink to="/settings" label="Setting" icon="fas fa-cog" />
+
             </nav>
             <LogoutButton sendLogout={sendLogout} />
         </aside>
