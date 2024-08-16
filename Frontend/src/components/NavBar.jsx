@@ -24,7 +24,7 @@ const NavBar = () => {
                 </div>
             </div>
             <nav className="flex flex-col p-12 pl-8 space-y-8">
-                <NavLink to="/dash/Dashboard-Total" label="Dashboard Total" icon="fas fa-home" />
+                <NavLink to="/dash/Dashboard-TOTAL" label="Dashboard Total" icon="fas fa-home" />
                 <NavLink to="/dash/Dashboard-COMBU" label="Dashboard Combu" icon="fas fa-home" />
                 <NavLink to="/dash/Dashboard-HUB" label="Dashboard Hub" icon="fas fa-home" />
                 <NavLink to="/dash/employees" label="Employees" icon="fas fa-users" />

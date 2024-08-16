@@ -6,7 +6,7 @@ import './ImportEmployees.css'; // Import external CSS for additional styling
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const ImportEmployeescombu = () => {
+const ImportEmployeeshc = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,7 +37,7 @@ const ImportEmployeescombu = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:3500/employeescombu/import', formData, {
+      const response = await axios.post('http://localhost:3500/employeeshc/import', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -55,7 +55,7 @@ const ImportEmployeescombu = () => {
   const fetchStatistics = async () => {
     try {
       // Fetch employee data
-      const employeesResponse = await axios.get('http://localhost:3500/employeescombu');
+      const employeesResponse = await axios.get('http://localhost:3500/employeeshc');
       const employees = employeesResponse.data;
 
       if (employees.length === 0) {
@@ -95,7 +95,6 @@ const ImportEmployeescombu = () => {
         count,
       })));
 
-
       // Calculate service data
       const services = {};
       employees.forEach(emp => {
@@ -107,8 +106,9 @@ const ImportEmployeescombu = () => {
         count,
       })));
 
+
       // Fetch statistics data
-      const statisticsResponse = await axios.get('http://localhost:3500/statisticsCombu');
+      const statisticsResponse = await axios.get('http://localhost:3500/statisticshc');
       const statistics = statisticsResponse.data;
 
       if (statistics.length === 0) {
@@ -126,7 +126,7 @@ const ImportEmployeescombu = () => {
   const handleAddStat = async (event) => {
     event.preventDefault();
     try {
-      await axios.post('http://localhost:3500/statisticsCombu', newStat);
+      await axios.post('http://localhost:3500/statisticshc', newStat);
       setMessage('Statistics added successfully.');
       setNewStat({ year: '', month: '', absenteeism: '', overtime: '', turnover: '' });
       fetchStatistics(); // Refresh statistics data
@@ -139,7 +139,7 @@ const ImportEmployeescombu = () => {
     event.preventDefault();
     try {
       if (!editStat) return;
-      await axios.put(`http://localhost:3500/statisticsCombu/${editStat._id}`, editStat);
+      await axios.put(`http://localhost:3500/statisticshc/${editStat._id}`, editStat);
       setMessage('Statistics updated successfully.');
       setEditStat(null);
       fetchStatistics(); // Refresh statistics data
@@ -195,7 +195,6 @@ const ImportEmployeescombu = () => {
       },
     ],
   };
-
 
   return (
     <div className="import-employees">
@@ -264,7 +263,7 @@ const ImportEmployeescombu = () => {
             }
           }} />
         </div>
-        
+
         <div className="statistics-data">
           <h3>Statistics Overview</h3>
           <form onSubmit={editStat ? handleUpdateStat : handleAddStat} className="stats-form">
@@ -334,4 +333,4 @@ const ImportEmployeescombu = () => {
   );
 };
 
-export default ImportEmployeescombu;
+export default ImportEmployeeshc;
