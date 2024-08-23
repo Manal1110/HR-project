@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import './ImportEmployees.css'; // Import external CSS for additional styling
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMale, faFemale } from '@fortawesome/free-solid-svg-icons';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const ImportEmployeeshc = () => {
   const [file, setFile] = useState(null);
@@ -14,7 +18,7 @@ const ImportEmployeeshc = () => {
   const [miMdMsStats, setMiMdMsStats] = useState({ MI: 0, MD: 0, MS: 0 });
   const [departmentData, setDepartmentData] = useState([]);
   const [statisticsData, setStatisticsData] = useState([]);
-  const [newStat, setNewStat] = useState({ year: '', month: '', absenteeism: '', overtime: '', turnover: '' });
+  const [newStat, setNewStat] = useState({ year: '', month: '', absenteeism: '', overtime: '', turnover: '' }); 
   const [editStat, setEditStat] = useState(null);
   const [serviceData, setServiceData] = useState([]); // State for service data
 
@@ -170,18 +174,58 @@ const ImportEmployeeshc = () => {
     ],
   };
 
-  const genderHistogramData = {
+  const genderPieData = {
     labels: ['Males', 'Females'],
     datasets: [
       {
         label: 'Percentage',
         data: [genderStats.male, genderStats.female],
-        backgroundColor: ['rgba(54, 162, 235, 0.6)', 'rgba(255, 99, 132, 0.6)'],
-        borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
-        borderWidth: 1,
+        backgroundColor: [
+          'rgb(119, 118, 179)', // Sophisticated dark blue
+          'rgb(235, 211, 248)' // Elegant peach
+        ],
+        borderColor: [
+          'rgb(90, 99, 156)',  // Dark grey for border
+          'rgb(226, 187, 233)' // Darker peach for border
+        ],
+        borderWidth: 2,
+        hoverOffset: 6,  // Slightly lift the segment on hover
+        hoverBackgroundColor: [
+          'rgb(90, 99, 156)', // Darker blue for hover effect
+          'rgb(226, 187, 233)' // Daring peach for hover effect
+        ],
       },
     ],
   };
+  
+
+  const miMdMsPieData = {
+    labels: ['MI', 'MD', 'MS'],
+    datasets: [
+      {
+        label: 'Percentage',
+        data: [miMdMsStats.MI, miMdMsStats.MD, miMdMsStats.MS],
+        backgroundColor: [
+          'rgb(90, 99, 156)',  // Soft blue
+          'rgb(155, 134, 189)',  // Light teal
+          'rgb(247, 239, 229)'    // Soft orange
+        ],
+        borderColor: [
+          'rgb(90, 99, 156)',  // Soft blue
+          'rgb(155, 134, 189)',  // Light teal
+          'rgb(247, 239, 229)'   // Soft orange     // Darker orange for contrast
+        ],
+        borderWidth: 2,
+        hoverOffset: 8,  // Slightly lift the segment on hover
+        hoverBackgroundColor: [
+          'rgb(90, 99, 156)',  // Soft blue
+          'rgb(155, 134, 189)',  // Light teal
+          'rgb(226, 187, 233)'   // Soft orange       // Darker orange for hover effect
+        ],
+      },
+    ],
+  };
+  
 
   const serviceChartData = {
     labels: serviceData.map(d => d.service),
@@ -196,132 +240,251 @@ const ImportEmployeeshc = () => {
     ],
   };
 
+   
+  
+    const totalIcons = 10; // Number of icons to represent 100%
+    const maleIcons = Math.round((genderStats.male / 100) * totalIcons);
+    const femaleIcons = totalIcons - maleIcons;
+
   return (
-    <div className="import-employees">
-      <h2>Import Employees</h2>
-      <form onSubmit={handleSubmit} className="form">
-        <input
-          type="file"
-          accept=".xlsx, .xls"
-          onChange={handleFileChange}
-          className="file-input"
-        />
-        <button type="submit" disabled={loading} className="submit-button">
-          {loading ? 'Uploading...' : 'Upload'}
-        </button>
+
+  
+    <div className="max-w-screen overflow-x-hidden px-4 pt-4 bg-gray-100 font-playfair">
+      <div className='bg-gray-50 p-6 mb-6 rounded-lg border-2	border-darkpurple shadow-lg '>
+      <h2 className="text-center text-2xl font-bold mb-5 text-darkpurple">Dashboard: Analysis of the Total Headcount</h2>
+      <form onSubmit={handleSubmit} className="form flex justify-between mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+          <input
+              type="file"
+              accept=".xlsx, .xls"
+              onChange={handleFileChange}
+              className="file-input border border-gray-300 rounded-lg p-2  bg-darkpurple text-white"
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className={`submit-button px-16 py-2 rounded-lg text-white ml-6 ${
+                loading ? 'bg-darkpurple cursor-not-allowed' : 'bg-darkpurple hover:bg-blue-700'
+              }`}
+            >
+              {loading ? 'Uploading...' : 'Upload'}
+            </button>
+          </div>
+          <div className='mr-6'>
+            <button
+              onClick={fetchStatistics}
+              className="refresh-button px-4 py-2 bg-darkpurple text-white rounded-lg hover:bg-purple-700 justify-end"
+            >
+              Refresh Statistics
+            </button>
+          </div>
+    
+           
+        </div>
+        
       </form>
-      {message && <p className="message">{message}</p>}
+      {message && <p className="message text-red-600 text-center mb-4">{message}</p>}
+  
+      </div>
       
-      <button onClick={fetchStatistics} className="refresh-button">Refresh Statistics</button>
-
-      <div className="statistics">
-        <div className="gender-stats">
-          <h3>Gender Distribution</h3>
-          <Bar data={genderHistogramData} options={{
-            plugins: {
-              legend: { display: false },
-              tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw.toFixed(2)}%` } }
-            },
-            scales: {
-              x: { beginAtZero: true, title: { display: true, text: 'Gender' } },
-              y: { beginAtZero: true, title: { display: true, text: 'Percentage' } }
-            }
-          }} />
+      
+  
+      <div className="statistics grid grid-cols-1 md:grid-cols-3 gap-6 ">
+      <div className="gender-stats p-6 rounded-lg shadow-2xl border-2 border-darkpurple bg-white flex flex-col justify-center items-center">
+      <h3 className="text-2xl font-bold mb-6 text-center text-gray-800 drop-shadow-md">
+        Gender Distribution
+      </h3>
+      <div className="flex justify-center items-center space-x-2 flex-grow">
+        {/* Male Icons */}
+        {[...Array(maleIcons)].map((_, index) => (
+          <FontAwesomeIcon
+            key={`male-${index}`}
+            icon={faMale}
+            className="text-iconb text-5xl transform scale-y-150 "
+          />
+        ))}
+        {/* Female Icons */}
+        {[...Array(femaleIcons)].map((_, index) => (
+          <FontAwesomeIcon
+            key={`female-${index}`}
+            icon={faFemale}
+            className="text-iconf text-5xl scale-y-150"
+          />
+        ))}
+      </div>
+      <div className="mt-4 text-gray-700 text-center">
+        <p>{genderStats.male}% Males</p>
+        <p>{genderStats.female}% Females</p>
+      </div>
+    </div>
+    
+    
+        <div className="department-chart bg-gray-50 p-6 rounded-lg shadow-lg border-2	border-darkpurple">
+          <h3 className="text-lg font-semibold mb-4 pt-4">Department Distribution</h3>
+          <Bar
+            data={departmentChartData}
+            options={{
+              plugins: {
+                legend: { display: true },
+                tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw}` } },
+              },
+              scales: {
+                x: { beginAtZero: true, title: { display: true, text: 'Department' } },
+                y: { beginAtZero: true, title: { display: true, text: 'Employee Count' } },
+              },
+            }}
+          />
         </div>
 
-        <div className="mi-md-ms-stats">
-          <h3>MI, MD, MS Statistics</h3>
-          <p>MI: {miMdMsStats.MI.toFixed(2)}%</p>
-          <p>MD: {miMdMsStats.MD.toFixed(2)}%</p>
-          <p>MS: {miMdMsStats.MS.toFixed(2)}%</p>
+        <div className="mi-md-ms-stats p-6 rounded-lg shadow-2xl border-2 border-darkpurple bg-gray-50">
+      <h3 className="text-2xl font-bold mb-6 text-center text-darkpurple drop-shadow-md">
+        MI, MD, MS Statistics
+      </h3>
+      <div className="flex justify-center"> {/* Center the chart */}
+        <div className="w-3/4 h-3/4"> {/* Adjust the width and height as needed */}
+          <Pie
+            data={miMdMsPieData}
+            options={{
+              plugins: {
+                legend: {
+                  display: true,
+                  position: 'bottom',
+                  labels: {
+                    color: '#333',  // Dark grey for text
+                    font: { size: 16, weight: 'bold' },
+                    padding: 20,
+                  },
+                },
+                tooltip: {
+                  backgroundColor: 'rgba(0, 0, 0, 0.7)',  // Dark tooltip background
+                  titleFont: { size: 14, weight: 'bold', color: '#FFF' }, // White title text
+                  bodyFont: { size: 14, color: '#EEE' }, // Light grey body text
+                  callbacks: {
+                    label: (context) =>
+                      `${context.label}: ${context.raw.toFixed(2)}%`,
+                  },
+                },
+              },
+            }}
+          />
         </div>
-
-        <div className="department-chart">
-          <h3>Department Distribution</h3>
-          <Bar data={departmentChartData} options={{
-            plugins: {
-              legend: { display: true },
-              tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw}` } }
-            },
-            scales: {
-              x: { beginAtZero: true, title: { display: true, text: 'Department' } },
-              y: { beginAtZero: true, title: { display: true, text: 'Employee Count' } }
-            }
-          }} />
+      </div>
+    </div>
+    
+  
+        <div className="service-stats bg-gray-50 p-6 rounded-lg shadow-lg border-2	border-darkpurple mb-4">
+          <h3 className="text-lg font-semibold mb-4">Service Distribution</h3>
+          <Bar
+            data={serviceChartData}
+            options={{
+              plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw}` } },
+              },
+              scales: {
+                x: { beginAtZero: true, title: { display: true, text: 'Service' } },
+                y: { beginAtZero: true, title: { display: true, text: 'Employee Count' } },
+              },
+            }}
+          />
         </div>
-
-        <div className="service-stats">
-          <h3>Service Distribution</h3>
-          <Bar data={serviceChartData} options={{
-            plugins: {
-              legend: { display: false },
-              tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw}` } }
-            },
-            scales: {
-              x: { beginAtZero: true, title: { display: true, text: 'Service' } },
-              y: { beginAtZero: true, title: { display: true, text: 'Employee Count' } }
-            }
-          }} />
-        </div>
-
-        <div className="statistics-data">
-          <h3>Statistics Overview</h3>
-          <form onSubmit={editStat ? handleUpdateStat : handleAddStat} className="stats-form">
+  
+        <div className="statistics-data bg-gray-50 p-6 rounded-lg shadow-lg border-2	border-darkpurple col-span-1 md:col-span-2 mb-4">
+          <h3 className="text-lg font-semibold mb-4">Statistics Overview</h3>
+          <form
+            onSubmit={editStat ? handleUpdateStat : handleAddStat}
+            className="stats-form grid grid-cols-2 md:grid-cols-3 gap-4 mb-6"
+          >
             <input
               type="number"
               placeholder="Year"
               value={editStat ? editStat.year : newStat.year}
-              onChange={(e) => (editStat ? setEditStat({ ...editStat, year: e.target.value }) : setNewStat({ ...newStat, year: e.target.value }))}
+              onChange={(e) =>
+                editStat
+                  ? setEditStat({ ...editStat, year: e.target.value })
+                  : setNewStat({ ...newStat, year: e.target.value })
+              }
+              className="border border-darkpurple rounded-lg p-2"
             />
             <input
               type="number"
               placeholder="Month"
               value={editStat ? editStat.month : newStat.month}
-              onChange={(e) => (editStat ? setEditStat({ ...editStat, month: e.target.value }) : setNewStat({ ...newStat, month: e.target.value }))}
+              onChange={(e) =>
+                editStat
+                  ? setEditStat({ ...editStat, month: e.target.value })
+                  : setNewStat({ ...newStat, month: e.target.value })
+              }
+              className="border border-darkpurple rounded-lg p-2"
             />
             <input
               type="number"
               placeholder="Absenteeism"
               value={editStat ? editStat.absenteeism : newStat.absenteeism}
-              onChange={(e) => (editStat ? setEditStat({ ...editStat, absenteeism: e.target.value }) : setNewStat({ ...newStat, absenteeism: e.target.value }))}
+              onChange={(e) =>
+                editStat
+                  ? setEditStat({ ...editStat, absenteeism: e.target.value })
+                  : setNewStat({ ...newStat, absenteeism: e.target.value })
+              }
+              className="border border-darkpurple rounded-lg p-2"
             />
             <input
               type="number"
               placeholder="Overtime"
               value={editStat ? editStat.overtime : newStat.overtime}
-              onChange={(e) => (editStat ? setEditStat({ ...editStat, overtime: e.target.value }) : setNewStat({ ...newStat, overtime: e.target.value }))}
+              onChange={(e) =>
+                editStat
+                  ? setEditStat({ ...editStat, overtime: e.target.value })
+                  : setNewStat({ ...newStat, overtime: e.target.value })
+              }
+              className="border border-darkpurple rounded-lg p-2"
             />
             <input
               type="number"
               placeholder="Turnover"
               value={editStat ? editStat.turnover : newStat.turnover}
-              onChange={(e) => (editStat ? setEditStat({ ...editStat, turnover: e.target.value }) : setNewStat({ ...newStat, turnover: e.target.value }))}
+              onChange={(e) =>
+                editStat
+                  ? setEditStat({ ...editStat, turnover: e.target.value })
+                  : setNewStat({ ...newStat, turnover: e.target.value })
+              }
+              className="border border-darkpurple rounded-lg p-2"
             />
-            <button type="submit" className="submit-button">
+            <button
+              type="submit"
+              className="submit-button col-span-2 md:col-span-3 bg-darkpurple text-white rounded-lg p-2 hover:bg-blue-700"
+            >
               {editStat ? 'Update Statistics' : 'Add Statistics'}
             </button>
           </form>
-          <table className="stats-table">
-            <thead>
+  
+          <table className="stats-table w-full text-left border border-darkpurple rounded-lg overflow-hidden">
+            <thead className="bg-darkpurple">
               <tr>
-                <th>Year</th>
-                <th>Month</th>
-                <th>Absenteeism</th>
-                <th>Overtime</th>
-                <th>Turnover</th>
-                <th>Actions</th>
+                <th className="px-4 py-2">Year</th>
+                <th className="px-4 py-2">Month</th>
+                <th className="px-4 py-2">Absenteeism</th>
+                <th className="px-4 py-2">Overtime</th>
+                <th className="px-4 py-2">Turnover</th>
+                <th className="px-4 py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
               {statisticsData.map((stat) => (
-                <tr key={stat._id}>
-                  <td>{stat.year}</td>
-                  <td>{stat.month}</td>
-                  <td>{stat.absenteeism}</td>
-                  <td>{stat.overtime}</td>
-                  <td>{stat.turnover}</td>
-                  <td>
-                    <button onClick={() => handleEditClick(stat)} className="edit-button">Edit</button>
+                <tr key={stat._id} className="hover:bg-gray-100">
+                  <td className="px-4 py-2">{stat.year}</td>
+                  <td className="px-4 py-2">{stat.month}</td>
+                  <td className="px-4 py-2">{stat.absenteeism}</td>
+                  <td className="px-4 py-2">{stat.overtime}</td>
+                  <td className="px-4 py-2">{stat.turnover}</td>
+                  <td className="px-4 py-2">
+                    <button
+                      onClick={() => handleEditClick(stat)}
+                      className="edit-button text-blue-600 hover:text-blue-800"
+                    >
+                      Edit
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -331,6 +494,7 @@ const ImportEmployeeshc = () => {
       </div>
     </div>
   );
-};
-
+}
 export default ImportEmployeeshc;
+
+ 

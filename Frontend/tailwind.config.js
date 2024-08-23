@@ -13,6 +13,9 @@ module.exports = {
         lightpurple: '#EFEFFC',
         midpurple: '#E7E7FF',
         darkpurple: '#01008A',
+        iconb: '#5A639C',
+        iconf: '#FB9AD1'
+        
       },
       keyframes: {
         slideDown: {
