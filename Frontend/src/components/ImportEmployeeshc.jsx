@@ -18,7 +18,7 @@ const ImportEmployeeshc = () => {
   const [miMdMsStats, setMiMdMsStats] = useState({ MI: 0, MD: 0, MS: 0 });
   const [departmentData, setDepartmentData] = useState([]);
   const [statisticsData, setStatisticsData] = useState([]);
-  const [newStat, setNewStat] = useState({ year: '', month: '', absenteeism: '', overtime: '', turnover: '' });
+  const [newStat, setNewStat] = useState({ year: '', month: '', absenteeism: '', overtime: '', turnover: '' }); 
   const [editStat, setEditStat] = useState(null);
   const [serviceData, setServiceData] = useState([]); // State for service data
   const [month, setMonth] = useState('');
@@ -352,6 +352,7 @@ const ImportEmployeeshc = () => {
     const [year, month] = monthStr ? monthStr.split('-') : [new Date().getFullYear(), (new Date().getMonth() + 1).toString().padStart(2, '0')];
     return `Month: ${month}, Year: ${year}`;
   };
+
   return (
 
   
@@ -368,6 +369,7 @@ const ImportEmployeeshc = () => {
               className="file-input border border-gray-300 rounded-lg p-2  bg-darkpurple text-white"
             />
             <input type="month" value={month} onChange={handleMonthChange} required className="month-input" />
+
             <button
               type="submit"
               disabled={loading}
@@ -378,6 +380,7 @@ const ImportEmployeeshc = () => {
               {loading ? 'Uploading...' : 'Upload'}
             </button>
           </div>
+
           {message && <p className="message">{message}</p>}
 
 
@@ -459,6 +462,7 @@ const ImportEmployeeshc = () => {
               scales: {
                 x: { beginAtZero: true, title: { display: true, text: 'Department' } },
                 y: { beginAtZero: true, title: { display: true, text: 'Employee Count' } },
+
               },
             }}
           />
@@ -492,6 +496,7 @@ const ImportEmployeeshc = () => {
                       `${context.label}: ${context.raw.toFixed(2)}%`,
                   },
                 },
+
               },
             }}
           />
@@ -516,6 +521,7 @@ const ImportEmployeeshc = () => {
             }}
           />
         </div>
+
   
         <div className="statistics-data bg-gray-50 p-6 rounded-lg shadow-lg border-2	border-darkpurple col-span-1 md:col-span-2 mb-4">
           <h3 className="text-lg font-semibold mb-4">Statistics Overview</h3>
@@ -612,7 +618,7 @@ const ImportEmployeeshc = () => {
                     >
                       Edit
                     </button>
-                    
+
                   </td>
                 </tr>
               ))}
