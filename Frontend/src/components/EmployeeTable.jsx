@@ -2,7 +2,7 @@ import React from 'react';
 
 const EmployeeTable = ({ filteredEmployees, selectedFields, handleEditClick, handleDelete }) => {
     return (
-        <div className="table-container max-w-full overflow-x-auto">
+        <div className="table-container max-w-full overflow-x-auto overflow-y-auto">
             <table className="min-w-full border-collapse">
                 <thead>
                     <tr className="bg-darkpurple text-white">

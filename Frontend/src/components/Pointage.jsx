@@ -350,64 +350,60 @@ const Pointage = () => {
      
       {showAnalysis && (
         <div className="chartContainer">
-
-
-<Bar
-  data={{
-    labels: analysisData.labels,
-    datasets: analysisData.datasets.map((dataset, index) => ({
-      ...dataset,
-      backgroundColor: colors[index % colors.length],
-      borderColor: colors[index % colors.length].replace('0.2', '1'), // Adjust border color to be fully opaque
-      borderWidth: 1,
-    })),
-  }}
-  ref={chartRef}
-  options={{
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            let label = context.dataset.label || '';
-            if (label) {
-              label += ': ';
-            }
-            if (context.parsed.y !== null) {
-              label += context.parsed.y;
-            }
-            return label;
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        stacked: true,
-        title: {
-          display: true,
-          text: 'Date'
-        },
-        ticks: {
-          autoSkip: true,
-          maxRotation: 45,
-        }
-      },
-      y: {
-        stacked: true,
-        title: {
-          display: true,
-          text: 'Total'
-        }
-      }
-    }
-  }}
-/>
-
-
+          <Bar
+            data={{
+              labels: analysisData.labels,
+              datasets: analysisData.datasets.map((dataset, index) => ({
+                ...dataset,
+                backgroundColor: colors[index % colors.length],
+                borderColor: colors[index % colors.length].replace('0.2', '1'), // Adjust border color to be fully opaque
+                borderWidth: 1,
+              })),
+            }}
+            ref={chartRef}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'top',
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      let label = context.dataset.label || '';
+                      if (label) {
+                        label += ': ';
+                      }
+                      if (context.parsed.y !== null) {
+                        label += context.parsed.y;
+                      }
+                      return label;
+                    }
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  stacked: true,
+                  title: {
+                    display: true,
+                    text: 'Date'
+                  },
+                  ticks: {
+                    autoSkip: true,
+                    maxRotation: 45,
+                  }
+                },
+                y: {
+                  stacked: true,
+                  title: {
+                    display: true,
+                    text: 'Total'
+                  }
+                }
+              }
+            }}
+          />
           <button onClick={exportAnalysisToExcel} className="exportButton">
             Export Analysis to Excel
           </button>
@@ -415,38 +411,52 @@ const Pointage = () => {
             Download Chart
           </button>
         </div>
-      
-)}
-
-
+      )}
+  
       {pointages.length > 0 && (
-        <table>
+        <div className="table-container max-w-full overflow-x-auto overflow-y-auto">
+          <table className="min-w-full border-collapse">
           <thead>
-            <tr>
-              {Object.keys(pointages[0]).map((key) => (
-                selectedFields[key] && key !== '_id' && key !== '__v' && <th key={key}>{key}</th>
-              ))}
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pointages.map((pointage) => (
-              <tr key={pointage._id}>
-                {Object.keys(pointage).map((key) => (
-                  selectedFields[key] && key !== '_id' && key !== '__v' && <td key={key}>{pointage[key]}</td>
+              <tr className="bg-darkpurple text-white">
+                {Object.keys(pointages[0]).map((key) => (
+                  selectedFields[key] && key !== '_id' && key !== '__v' && 
+                  <th key={key} className="px-12 py-8 whitespace-nowrap">{key}</th>
                 ))}
-                <td>
-                  <button onClick={() => handleEdit(pointage)} className="button">
-                    Edit
-                  </button>
-                  <button onClick={() => handleDelete(pointage._id)} className="buttonDanger">
-                    Delete
-                  </button>
-                </td>
+                <th className="px-12 py-8 whitespace-nowrap">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {pointages.map((pointage, index) => (
+                <tr
+                  key={pointage._id}
+                  className={`transition-colors duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white hover:bg-midpurple' : 'bg-lightpurple hover:bg-midpurple'}`}
+                >
+                  {Object.keys(pointage).map((key) => (
+                    selectedFields[key] && key !== '_id' && key !== '__v' && 
+                    <td key={key} className="px-2 py-8 whitespace-nowrap text-center align-middle">{pointage[key]}</td>
+                  ))}
+                  <td className="px-2 py-8 whitespace-nowrap">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEdit(pointage)}
+                        className="bg-darkpurple hover:bg-hoverpurple text-white px-2 py-1 rounded"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(pointage._id)}
+                        className="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
