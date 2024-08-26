@@ -21,10 +21,28 @@ const ImportEmployeeshc = () => {
   const [newStat, setNewStat] = useState({ year: '', month: '', absenteeism: '', overtime: '', turnover: '' }); 
   const [editStat, setEditStat] = useState(null);
   const [serviceData, setServiceData] = useState([]); // State for service data
+  const [month, setMonth] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [enteredMonth, setEnteredMonth] = useState(''); // State for entered month
+  const [absenteeismData, setAbsenteeismData] = useState({ absenteeism: 0, turnover: 0, overtime: 0 });
+  const [monthData, setMonthData] = useState({});
 
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
     setMessage('');
+  };
+
+  const handleMonthChange = (e) => {
+    setMonth(e.target.value);
+  };
+
+  const handleEnteredMonthChange = (e) => {
+    setEnteredMonth(e.target.value);
   };
 
   const handleSubmit = async (event) => {
@@ -35,8 +53,15 @@ const ImportEmployeeshc = () => {
       return;
     }
 
+    if (!month) {
+      setMessage('Please select a month.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('month', month);
+
 
     setLoading(true);
 
@@ -56,10 +81,13 @@ const ImportEmployeeshc = () => {
     }
   };
 
-  const fetchStatistics = async () => {
+  const fetchStatistics = async (selectedMonth = enteredMonth) => {
+    const currentMonth = new Date().toISOString().slice(0, 7); // Get current month in YYYY-MM format
+    const monthToFetch = selectedMonth || currentMonth;
+    const formattedMonth = monthToFetch.split('-').reverse().join('-');
+
     try {
-      // Fetch employee data
-      const employeesResponse = await axios.get('http://localhost:3500/employeeshc');
+      const employeesResponse = await axios.get(`http://localhost:3500/employeeshc/month/${monthToFetch}`);
       const employees = employeesResponse.data;
 
       if (employees.length === 0) {
@@ -110,7 +138,6 @@ const ImportEmployeeshc = () => {
         count,
       })));
 
-
       // Fetch statistics data
       const statisticsResponse = await axios.get('http://localhost:3500/statisticshc');
       const statistics = statisticsResponse.data;
@@ -121,9 +148,79 @@ const ImportEmployeeshc = () => {
       }
 
       setStatisticsData(statistics);
+      const monthContributions = {};
+
+      statistics.forEach(stat => {
+        const { absenteeism, turnover, overtime, month } = stat;
+
+        if (!monthContributions[month]) {
+          monthContributions[month] = { absenteeism: 0, turnover: 0, overtime: 0 };
+        }
+
+        monthContributions[month].absenteeism += absenteeism;
+        monthContributions[month].turnover += turnover;
+        monthContributions[month].overtime += overtime;
+      });
+
+      setMonthData(monthContributions);
+
 
     } catch (error) {
       setMessage('Error fetching statistics: ' + error.message);
+    }
+  };
+
+
+  const getStackedBarData = () => {
+    const months = Object.keys(monthData);
+  
+    // Map month numbers to month names
+    const monthLabels = months.map(month => {
+      const monthIndex = parseInt(month, 10) - 1; // Convert month number to zero-based index
+      return monthNames[monthIndex] || 'Unknown'; // Default to 'Unknown' if out of range
+    });
+  
+    // Prepare datasets for each month
+    const datasets = months.map((month, index) => {
+      return {
+        label: monthLabels[index],
+        data: [
+          monthData[month].absenteeism,
+          monthData[month].turnover,
+          monthData[month].overtime
+        ],
+        backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`,
+        borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
+        borderWidth: 1,
+      };
+    });
+  
+    return {
+      labels: ['Absenteeism', 'Turnover', 'Overtime'], // Metrics on x-axis
+      datasets: datasets
+    };
+  };
+  
+  const stackedBarChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { display: true },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.dataset.label}: ${context.raw.toFixed(2)}`
+        }
+      }
+    },
+    scales: {
+      x: { 
+        stacked: true, 
+        title: { display: true, text: 'Metrics' },
+      },
+      y: { 
+        stacked: true, 
+        title: { display: true, text: 'Total Value' }, 
+        beginAtZero: true 
+      }
     }
   };
 
@@ -160,6 +257,10 @@ const ImportEmployeeshc = () => {
   useEffect(() => {
     fetchStatistics(); // Fetch statistics on initial render
   }, []);
+
+  const handleFetchStatistics = () => {
+    fetchStatistics(enteredMonth);
+  };
 
   const departmentChartData = {
     labels: departmentData.map(d => d.department),
@@ -246,6 +347,12 @@ const ImportEmployeeshc = () => {
     const maleIcons = Math.round((genderStats.male / 100) * totalIcons);
     const femaleIcons = totalIcons - maleIcons;
 
+      // Format the month and year, default to current month if none is selected
+  const formatMonthYear = (monthStr) => {
+    const [year, month] = monthStr ? monthStr.split('-') : [new Date().getFullYear(), (new Date().getMonth() + 1).toString().padStart(2, '0')];
+    return `Month: ${month}, Year: ${year}`;
+  };
+
   return (
 
   
@@ -261,6 +368,8 @@ const ImportEmployeeshc = () => {
               onChange={handleFileChange}
               className="file-input border border-gray-300 rounded-lg p-2  bg-darkpurple text-white"
             />
+            <input type="month" value={month} onChange={handleMonthChange} required className="month-input" />
+
             <button
               type="submit"
               disabled={loading}
@@ -271,6 +380,27 @@ const ImportEmployeeshc = () => {
               {loading ? 'Uploading...' : 'Upload'}
             </button>
           </div>
+
+          {message && <p className="message">{message}</p>}
+
+
+                {/* Display selected month and year */}
+      <div className="month-year-display">
+        <p>{`Selected Month: ${formatMonthYear(month)}`}</p>
+        <p>{`Entered Month: ${formatMonthYear(enteredMonth)}`}</p>
+      </div>
+      
+
+      <input
+        type="month"
+        value={enteredMonth}
+        onChange={handleEnteredMonthChange}
+        className="month-input"
+      />
+      <button onClick={handleFetchStatistics} className="fetch-button">
+        Fetch Statistics
+      </button>
+
           <div className='mr-6'>
             <button
               onClick={fetchStatistics}
@@ -332,6 +462,7 @@ const ImportEmployeeshc = () => {
               scales: {
                 x: { beginAtZero: true, title: { display: true, text: 'Department' } },
                 y: { beginAtZero: true, title: { display: true, text: 'Employee Count' } },
+
               },
             }}
           />
@@ -365,6 +496,7 @@ const ImportEmployeeshc = () => {
                       `${context.label}: ${context.raw.toFixed(2)}%`,
                   },
                 },
+
               },
             }}
           />
@@ -389,6 +521,7 @@ const ImportEmployeeshc = () => {
             }}
           />
         </div>
+
   
         <div className="statistics-data bg-gray-50 p-6 rounded-lg shadow-lg border-2	border-darkpurple col-span-1 md:col-span-2 mb-4">
           <h3 className="text-lg font-semibold mb-4">Statistics Overview</h3>
@@ -485,11 +618,20 @@ const ImportEmployeeshc = () => {
                     >
                       Edit
                     </button>
+
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+
+          <div className="histograms">
+        <h3>Statistics Histogram</h3>
+        <Bar
+          data={getStackedBarData()}
+          options={stackedBarChartOptions}
+        />
+      </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const employeehcSchema = new mongoose.Schema({
+  Date:{ type: String},
   Mat: { type: String, required: true },
   Nom: { type: String, required: true },
   Prénom: { type: String, required: true },
@@ -30,7 +31,8 @@ const employeehcSchema = new mongoose.Schema({
   SITE2: { type: String },
   Projet: { type: String },
   "Total Production": { type: String },
-  "CHEF DIRECT": { type: String }
+  "CHEF DIRECT": { type: String },
+  month: { type: String, required: true },
 });
 
 
