@@ -253,7 +253,6 @@ const ImportEmployeeshc = () => {
     setEditStat(stat);
     setNewStat(stat); // Populate form fields with current stat data for editing
   };
-
   useEffect(() => {
     fetchStatistics(); // Fetch statistics on initial render
   }, []);
