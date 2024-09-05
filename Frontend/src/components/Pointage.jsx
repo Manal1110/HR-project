@@ -201,7 +201,7 @@ const Pointage = () => {
   };
 
   const analyzeData = async () => {
-    try {
+    if (!showAnalysis) {try {
       const response = await axios.post('http://localhost:3500/pointage/analyze', {
         start: analysisPeriod.start,
         end: analysisPeriod.end,
@@ -219,6 +219,10 @@ const Pointage = () => {
     }
 
     console.log('Selected Motifs:', selectedMotifs);
+  } else {
+    // If `showAnalysis` is true, hide the analysis
+    setShowAnalysis(false);
+  }
   };
   
   
@@ -470,12 +474,11 @@ const Pointage = () => {
 </div>
 
 <button
-      onClick={() => setShowAnalysis(!showAnalysis)} // Toggle showAnalysis state
-      className="button"
-    >
-      {showAnalysis ? 'Hide Analysis' : 'Show Analysis'}
-    </button>
-
+  onClick={analyzeData} 
+  className="button"
+>
+  {showAnalysis ? 'Hide Analysis' : 'Show Analysis'}
+</button>
 
   {showAnalysis && (
     <div className="chartContainer mt-4">
