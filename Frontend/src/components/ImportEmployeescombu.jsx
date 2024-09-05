@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Bar } from 'react-chartjs-2';
+import { Bar, Doughnut } from 'react-chartjs-2';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import './ImportEmployees.css'; // Import external CSS for additional styling
@@ -413,30 +413,34 @@ const ImportEmployeescombu = () => {
   
       <div className="statistics grid grid-cols-1 md:grid-cols-3 gap-6 ">
       <div className="gender-stats p-6 rounded-lg shadow-2xl border-2 border-darkpurple bg-white flex flex-col justify-center items-center">
-      <h3 className="text-2xl font-bold mb-6 text-center text-gray-800 drop-shadow-md">
+      <h3 className="text-2xl font-bold mb-6 text-center text-darkpurple drop-shadow-md">
         Gender Distribution
       </h3>
       <div className="flex justify-center items-center space-x-2 flex-grow">
-        {/* Male Icons */}
-        {[...Array(maleIcons)].map((_, index) => (
-          <FontAwesomeIcon
-            key={`male-${index}`}
-            icon={faMale}
-            className="text-iconb text-5xl transform scale-y-150 "
-          />
-        ))}
-        {/* Female Icons */}
-        {[...Array(femaleIcons)].map((_, index) => (
-          <FontAwesomeIcon
-            key={`female-${index}`}
-            icon={faFemale}
-            className="text-iconf text-5xl scale-y-150"
-          />
-        ))}
-      </div>
-      <div className="mt-4 text-gray-700 text-center">
-        <p>{genderStats.male}% Males</p>
-        <p>{genderStats.female}% Females</p>
+        <Doughnut data={genderPieData} 
+        options={{
+              plugins: {
+                legend: {
+                  display: true,
+                  position: 'bottom',
+                  labels: {
+                    color: '#333',  // Dark grey for text
+                    font: { size: 16, weight: 'bold' },
+                    padding: 20,
+                  },
+                },
+                tooltip: {
+                  backgroundColor: 'rgba(0, 0, 0, 0.7)',  // Dark tooltip background
+                  titleFont: { size: 14, weight: 'bold', color: '#FFF' }, // White title text
+                  bodyFont: { size: 14, color: '#EEE' }, // Light grey body text
+                  callbacks: {
+                    label: (context) =>
+                      `${context.label}: ${context.raw.toFixed(2)}%`,
+                  },
+                },
+              },
+            }}
+           />
       </div>
     </div>
     

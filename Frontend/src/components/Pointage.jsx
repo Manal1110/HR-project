@@ -266,9 +266,11 @@ const Pointage = () => {
   
 
   return (
-    <div className="container">
-      <h1>Pointage Management</h1>
-      <button onClick={toggleForm} className="button">
+    <div className="container max-w-screen overflow-x-hidden mx-auto px-4 py-8 font-playfair">
+      <h1 className='text-2xl font-bold mb-4'>Pointage Management</h1>
+      
+      <div className="flex justify-between items-center mb-4">
+        <button onClick={toggleForm} className="button">
         {showForm ? 'Close Form' : 'Add New Pointage'}
       </button>
       {showForm && (
@@ -282,7 +284,98 @@ const Pointage = () => {
             className="input"
             required
           />
-          {/* Add other input fields here */}
+         
+          <input
+            type="text"
+            name="MATRICULE"
+            value={form.MATRICULE}
+            onChange={handleChange}
+            placeholder="MATRICULE"
+            className="input"
+
+          />
+          <input
+            type="text"
+            name="NOM"
+            value={form.NOM}
+            onChange={handleChange}
+            placeholder="NOM"
+            className="input"
+
+          />
+          <input
+            type="text"
+            name="PRENOM"
+            value={form.PRENOM}
+            onChange={handleChange}            
+            placeholder="PRENOM"
+            className="input"
+
+          />
+          <input
+            type="text"
+            name="UNITE"
+            value={form.UNITE}
+            onChange={handleChange}
+            placeholder="UNITE"
+            className="input"
+
+          />
+          <input
+            type="text"
+            name="TYPE"
+            value={form.TYPE}
+            onChange={handleChange}
+            placeholder="TYPE"
+            className="input"
+
+          />
+          <input
+            type="text"
+            name="SERVICE"
+            value={form.SERVICE}
+            onChange={handleChange}
+            placeholder="SERVICE"
+            className="input"
+
+          />
+          <input
+            type="text"
+            name="ENTREE"
+            value={form.ENTREE}
+            onChange={handleChange}
+            placeholder="ENTREE"
+            className="input"
+
+          />
+          <input
+            type="text"
+            name="SORTIE"
+            value={form.SORTIE}
+            onChange={handleChange}
+            placeholder="SORTIE"
+            className="input"
+
+          />
+          <input
+            type="text"
+            name="HN"
+            value={form.HN}
+            onChange={handleChange}
+            placeholder="HN"
+            className="input"
+
+          />
+          <input
+            type="text"
+            name="MOTIF"
+            value={form.MOTIF}
+            onChange={handleChange}
+            placeholder="MOTIF"
+            className="input"
+
+            /> 
+            
           <button type="submit" className="button">
             {editing ? 'Update Pointage' : 'Add Pointage'}
           </button>
@@ -311,6 +404,8 @@ const Pointage = () => {
           ))}
         </div>
       )}
+      </div>
+
       <h2>Analysis</h2>
       <input
         type="date"

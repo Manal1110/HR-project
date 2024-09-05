@@ -101,8 +101,8 @@ const ImportEmployeeshc = () => {
       const totalEmployees = employees.length;
 
       setGenderStats({
-        male: (maleCount / totalEmployees) * 100,
-        female: (femaleCount / totalEmployees) * 100,
+        male: Math.round((maleCount / totalEmployees) * 100),
+        female: Math.round((femaleCount / totalEmployees) * 100),
       });
 
       // Calculate MI, MD, MS statistics based on 'type CC'
@@ -421,7 +421,7 @@ const ImportEmployeeshc = () => {
   
       <div className="statistics grid grid-cols-1 md:grid-cols-3 gap-6 ">
       <div className="gender-stats p-6 rounded-lg shadow-2xl border-2 border-darkpurple bg-white flex flex-col justify-center items-center">
-      <h3 className="text-2xl font-bold mb-6 text-center text-gray-800 drop-shadow-md">
+      <h3 className="text-2xl font-bold mb-6 text-center text-darkpurple drop-shadow-md">
         Gender Distribution
       </h3>
       <div className="flex justify-center items-center space-x-2 flex-grow">
@@ -442,15 +442,15 @@ const ImportEmployeeshc = () => {
           />
         ))}
       </div>
-      <div className="mt-4 text-gray-700 text-center">
-        <p>{genderStats.male}% Males</p>
-        <p>{genderStats.female}% Females</p>
+      <div className="my-2 text-gray-700 text-center">
+        <h4 className="text-xl font-semibold text-center text-gray-800 ">{genderStats.male}% Males</h4>
+        <h4 className="text-xl font-semibold text-center text-gray-800">{genderStats.female}% Females</h4>
       </div>
     </div>
     
     
         <div className="department-chart bg-gray-50 p-6 rounded-lg shadow-lg border-2	border-darkpurple">
-          <h3 className="text-lg font-semibold mb-4 pt-4">Department Distribution</h3>
+          <h3 className="text-2xl font-bold mb-6 text-center text-darkpurple drop-shadow-md">Department Distribution</h3>
           <Bar
             data={departmentChartData}
             options={{
@@ -505,7 +505,7 @@ const ImportEmployeeshc = () => {
     
   
         <div className="service-stats bg-gray-50 p-6 rounded-lg shadow-lg border-2	border-darkpurple mb-4">
-          <h3 className="text-lg font-semibold mb-4">Service Distribution</h3>
+          <h3 className="text-2xl font-bold mb-6 text-center text-darkpurple drop-shadow-md">Service Distribution</h3>
           <Bar
             data={serviceChartData}
             options={{
@@ -523,7 +523,7 @@ const ImportEmployeeshc = () => {
 
   
         <div className="statistics-data bg-gray-50 p-6 rounded-lg shadow-lg border-2	border-darkpurple col-span-1 md:col-span-2 mb-4">
-          <h3 className="text-lg font-semibold mb-4">Statistics Overview</h3>
+          <h3 className="text-2xl font-bold mb-6 text-center text-darkpurple drop-shadow-md">Statistics Overview</h3>
           <form
             onSubmit={editStat ? handleUpdateStat : handleAddStat}
             className="stats-form grid grid-cols-2 md:grid-cols-3 gap-4 mb-6"
