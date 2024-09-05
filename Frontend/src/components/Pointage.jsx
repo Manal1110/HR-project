@@ -269,10 +269,21 @@ const Pointage = () => {
     <div className="container max-w-screen overflow-x-hidden mx-auto px-4 py-8 font-playfair">
       <h1 className='text-2xl font-bold mb-4'>Pointage Management</h1>
       
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-2">
         <button onClick={toggleForm} className="button">
         {showForm ? 'Close Form' : 'Add New Pointage'}
       </button>
+  
+      <button onClick={exportToExcel} className="button bg-darkpurple">
+        Export to Excel
+      </button>
+      <input type="file" onChange={handleFileUpload} className='button' />
+      <button onClick={() => setShowChoices(!showChoices)} className="button">
+        {showChoices ? 'Hide Choices' : 'Show Choices'}
+      </button>
+    
+      </div>
+
       {showForm && (
         <form onSubmit={handleSubmit} className="form">
           <input
@@ -382,131 +393,155 @@ const Pointage = () => {
           {error && <p style={{ color: 'red' }}>{error}</p>}
         </form>
       )}
-      <button onClick={exportToExcel} className="button">
-        Export to Excel
-      </button>
-      <input type="file" onChange={handleFileUpload} />
-      <button onClick={() => setShowChoices(!showChoices)} className="button">
-        {showChoices ? 'Hide Choices' : 'Show Choices'}
-      </button>
-      {showChoices && (
-        <div>
-          {Object.keys(selectedFields).map((field) => (
-            <label key={field}>
-              <input
-                type="checkbox"
-                name={field}
-                checked={selectedFields[field]}
-                onChange={handleFieldChange}
-              />
-              {field}
-            </label>
-          ))}
-        </div>
-      )}
-      </div>
 
-      <h2>Analysis</h2>
-      <input
-        type="date"
-        name="start"
-        value={analysisPeriod.start}
-        onChange={handlePeriodChange}
-        placeholder="Start Date"
-      />
-      <input
-        type="date"
-        name="end"
-        value={analysisPeriod.end}
-        onChange={handlePeriodChange}
-        placeholder="End Date"
-      />
-      <select name="type" onChange={(e) => setAnalysisPeriod(prev => ({ ...prev, type: e.target.value }))}>
-        <option value="day">Daily</option>
-        <option value="week">Weekly</option>
-        <option value="month">Monthly</option>
-      </select>
-      <div>
-        {['CM', 'MAT', 'AUT', 'Récupération', 'CT', 'MIS', 'AT', 'ABSI', 'CG', 'CSS', 'FOR', 'MAR', '0'].map(motif => (
-          <label key={motif}>
-            <input
-              type="checkbox"
-              value={motif}
-              checked={selectedMotifs.includes(motif)}
-              onChange={handleMotifChange}
-            />
-            {motif}
-          </label>
-        ))}
-      </div>
-      <button onClick={analyzeData} className="button">
-        Analyze Data
-      </button>
-     
-      {showAnalysis && (
-        <div className="chartContainer">
-          <Bar
-            data={{
-              labels: analysisData.labels,
-              datasets: analysisData.datasets.map((dataset, index) => ({
-                ...dataset,
-                backgroundColor: colors[index % colors.length],
-                borderColor: colors[index % colors.length].replace('0.2', '1'), // Adjust border color to be fully opaque
-                borderWidth: 1,
-              })),
-            }}
-            ref={chartRef}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: 'top',
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function(context) {
-                      let label = context.dataset.label || '';
-                      if (label) {
-                        label += ': ';
-                      }
-                      if (context.parsed.y !== null) {
-                        label += context.parsed.y;
-                      }
-                      return label;
-                    }
-                  }
-                }
-              },
-              scales: {
-                x: {
-                  stacked: true,
-                  title: {
-                    display: true,
-                    text: 'Date'
-                  },
-                  ticks: {
-                    autoSkip: true,
-                    maxRotation: 45,
-                  }
-                },
-                y: {
-                  stacked: true,
-                  title: {
-                    display: true,
-                    text: 'Total'
-                  }
-                }
-              }
-            }}
+{showChoices && (
+  <div className="bg-gray-50 p-4 rounded-lg shadow-md">
+    <div className="grid grid-cols-2 gap-4">
+      {Object.keys(selectedFields).map((field) => (
+        <label
+          key={field}
+          className="flex items-center space-x-2 text-gray-800"
+        >
+          <input
+            type="checkbox"
+            name={field}
+            checked={selectedFields[field]}
+            onChange={handleFieldChange}
+            className="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
           />
-          <button onClick={exportAnalysisToExcel} className="exportButton">
-            Export Analysis to Excel
-          </button>
-          <button onClick={downloadChart} className="button">
-            Download Chart
-          </button>
-        </div>
-      )}
+          <span className="text-sm font-medium">{field}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+)}
+
+<h2 className='text-2xl font-bold mb-2 text-gray-800'>Analysis</h2>
+
+<div className="flex flex-row justify-evenly mb-2">
+  <input
+    type="date"
+    name="start"
+    value={analysisPeriod.start}
+    onChange={handlePeriodChange}
+    placeholder="Start Date"
+    className="input-field px-16 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  />
+  <input
+    type="date"
+    name="end"
+    value={analysisPeriod.end}
+    onChange={handlePeriodChange}
+    placeholder="End Date"
+    className="input-field px-16 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  />
+
+<select
+  name="type"
+  onChange={(e) => setAnalysisPeriod((prev) => ({ ...prev, type: e.target.value }))}
+  className=" px-16 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+>
+  <option value="day">Daily</option>
+  <option value="week">Weekly</option>
+  <option value="month">Monthly</option>
+</select>
+</div>
+
+
+
+<div className="bg-gray-50 p-4 rounded-lg shadow-md mb-2">
+  <h3 className="text-lg font-semibold mb-2 text-gray-700">Select Motifs</h3>
+  <div className="flex flex-row justify-between">
+    {['CM', 'MAT', 'AUT', 'Récupération', 'CT', 'MIS', 'AT', 'ABSI', 'CG', 'CSS', 'FOR', 'MAR', '0'].map((motif) => (
+      <label key={motif} className="flex items-center space-x-2 text-gray-800">
+        <input
+          type="checkbox"
+          value={motif}
+          checked={selectedMotifs.includes(motif)}
+          onChange={handleMotifChange}
+          className="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
+        />
+        <span className="text-sm font-medium">{motif}</span>
+      </label>
+    ))}
+  </div>
+
+  
+</div>
+
+<button
+      onClick={() => setShowAnalysis(!showAnalysis)} // Toggle showAnalysis state
+      className="button"
+    >
+      {showAnalysis ? 'Hide Analysis' : 'Show Analysis'}
+    </button>
+
+
+  {showAnalysis && (
+    <div className="chartContainer mt-4">
+      <Bar
+        data={{
+          labels: analysisData.labels,
+          datasets: analysisData.datasets.map((dataset, index) => ({
+            ...dataset,
+            backgroundColor: colors[index % colors.length],
+            borderColor: colors[index % colors.length].replace('0.2', '1'), // Adjust border color to be fully opaque
+            borderWidth: 1,
+          })),
+        }}
+        ref={chartRef}
+        options={{
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    label += context.parsed.y;
+                  }
+                  return label;
+                },
+              },
+            },
+          },
+          scales: {
+            x: {
+              stacked: true,
+              title: {
+                display: true,
+                text: 'Date',
+              },
+              ticks: {
+                autoSkip: true,
+                maxRotation: 45,
+              },
+            },
+            y: {
+              stacked: true,
+              title: {
+                display: true,
+                text: 'Total',
+              },
+            },
+          },
+        }}
+      />
+      <button onClick={exportAnalysisToExcel} className="exportButton mr-4">
+        Export Analysis to Excel
+      </button>
+      <button onClick={downloadChart} className="button">
+        Download Chart
+      </button>
+    </div>
+  )}    
+      
   
       {pointages.length > 0 && (
         <div className="table-container max-w-full overflow-x-auto overflow-y-auto">
