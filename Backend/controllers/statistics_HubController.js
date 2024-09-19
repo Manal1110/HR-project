@@ -67,14 +67,19 @@ exports.updateStatisticsHub = async (req, res) => {
 
 // Delete statistics
 exports.deleteStatisticsHub = async (req, res) => {
-    try {
-        const statistics = await StatisticsHub.findById(req.params.id);
+  try {
+    const { id } = req.params;
 
-        if (!statistics) return res.status(404).json({ message: 'Statistics not found' });
+    // Use findByIdAndDelete to delete the document directly
+    const deletedStatistics = await StatisticsHub.findByIdAndDelete(id);
 
-        await statistics.remove();
-        res.json({ message: 'Statistics deleted' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    if (!deletedStatistics) {
+      return res.status(404).json({ message: 'Statistics not found' });
     }
+
+    res.json({ message: 'Statistics deleted' });
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
 };

@@ -13,6 +13,8 @@ import GenderStatistics from './components/GenderStatistics'; // Import GenderSt
 import ImportEmployeeshub from './components/ImportEmployeeshub';
 import ImportEmployeescombu from './components/ImportEmployeescombu';
 import ImportEmployeeshc from './components/ImportEmployeeshc';
+import ImportEmployeesp2 from './components/ImportEmployeesp2';
+
 
 
 function App() {
@@ -32,6 +34,8 @@ function App() {
           <Route path="Dashboard-HUB" element={<ImportEmployeeshub />} /> 
           <Route path="Dashboard-COMBU" element={<ImportEmployeescombu />} /> 
           <Route path="Dashboard-TOTAL" element={<ImportEmployeeshc />} /> 
+          <Route path="Dashboard-P2" element={<ImportEmployeesp2 />} /> 
+
 
 
 

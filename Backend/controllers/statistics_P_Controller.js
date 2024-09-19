@@ -1,8 +1,8 @@
-// backend/controllers/statistics_HCController.js
-const Statisticshc = require('../models/statistics_HC');
+// backend/controllers/statistics_p2Controller.js
+const StatisticsP2 = require('../models/statistics_p2');
 
 // Get all statistics
-exports.getStatisticshc = async (req, res) => {
+exports.getStatisticsp2 = async (req, res) => {
     try {
         const { startDate, endDate } = req.query;
         const query = {};
@@ -11,7 +11,7 @@ exports.getStatisticshc = async (req, res) => {
             query.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
         }
 
-        const statistics = await Statisticshc.find(query);
+        const statistics = await StatisticsP2.find(query);
         res.json(statistics);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -21,11 +21,11 @@ exports.getStatisticshc = async (req, res) => {
 // Create new statistics
 
 // Add a new statistic
-exports.createStatisticshc = async (req, res) => {
+exports.createStatisticsp2 = async (req, res) => {
   try {
     const { year, month, absenteeism, overtime, turnover } = req.body;
 
-    const newStatistics = new Statisticshc({
+    const newStatistics = new StatisticsP2({
       year,
       month,
       absenteeism,
@@ -41,12 +41,12 @@ exports.createStatisticshc = async (req, res) => {
 };
 
 // Update existing statistics
-exports.updateStatisticshc = async (req, res) => {
+exports.updateStatisticsp2 = async (req, res) => {
   try {
     const { id } = req.params;
     const { year, month, absenteeism, overtime, turnover } = req.body;
 
-    const updatedStatistics = await Statisticshc.findByIdAndUpdate(id, {
+    const updatedStatistics = await StatisticsP2.findByIdAndUpdate(id, {
       year,
       month,
       absenteeism,
@@ -66,12 +66,12 @@ exports.updateStatisticshc = async (req, res) => {
 
 
 // Delete statistics
-exports.deleteStatisticshc = async (req, res) => {
+exports.deleteStatisticsp2 = async (req, res) => {
   try {
     const { id } = req.params;
 
     // Use findByIdAndDelete to delete the document directly
-    const deletedStatistics = await Statisticshc.findByIdAndDelete(id);
+    const deletedStatistics = await StatisticsP2.findByIdAndDelete(id);
 
     if (!deletedStatistics) {
       return res.status(404).json({ message: 'Statistics not found' });

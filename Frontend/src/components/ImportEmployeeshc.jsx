@@ -18,7 +18,7 @@ const ImportEmployeeshc = () => {
   const [miMdMsStats, setMiMdMsStats] = useState({ MI: 0, MD: 0, MS: 0 });
   const [departmentData, setDepartmentData] = useState([]);
   const [statisticsData, setStatisticsData] = useState([]);
-  const [newStat, setNewStat] = useState({ year: '', month: '', absenteeism: '', overtime: '', turnover: '' });
+  const [newStat, setNewStat] = useState({ year: '', month: '', absenteeism: '', overtime: '', turnover: '' }); 
   const [editStat, setEditStat] = useState(null);
   const [serviceData, setServiceData] = useState([]); // State for service data
   const [month, setMonth] = useState('');
@@ -26,6 +26,7 @@ const ImportEmployeeshc = () => {
   const [enteredMonth, setEnteredMonth] = useState(''); // State for entered month
   const [absenteeismData, setAbsenteeismData] = useState({ absenteeism: 0, turnover: 0, overtime: 0 });
   const [monthData, setMonthData] = useState({});
+  const [uniteData, setUniteData] = useState([]); 
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -135,6 +136,18 @@ const ImportEmployeeshc = () => {
 
       setServiceData(Object.entries(services).map(([service, count]) => ({
         service,
+        count,
+      })));
+
+      
+      // Calculate unite data
+      const unites = {};
+      employees.forEach(emp => {
+        unites[emp.Unité] = (unites[emp.Unité] || 0) + 1;
+      });
+
+      setUniteData(Object.entries(unites).map(([unite, count]) => ({
+        unite,
         count,
       })));
 
@@ -249,11 +262,19 @@ const ImportEmployeeshc = () => {
     }
   };
 
+  const handleDeleteStat = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3500/statisticshc/${id}`);
+      setMessage('Statistics deleted successfully.');
+      fetchStatistics(); // Refresh statistics data after deletion
+    } catch (error) {
+      setMessage('Error deleting statistics: ' + error.message);
+    }
+  };
   const handleEditClick = (stat) => {
     setEditStat(stat);
     setNewStat(stat); // Populate form fields with current stat data for editing
   };
-
   useEffect(() => {
     fetchStatistics(); // Fetch statistics on initial render
   }, []);
@@ -340,6 +361,19 @@ const ImportEmployeeshc = () => {
       },
     ],
   };
+  const uniteChartData = {
+    labels: uniteData.map(d => d.unite),
+    datasets: [
+      {
+        label: 'Employee Count by Unite',
+        data: uniteData.map(d => d.count),
+        backgroundColor: 'rgba(153, 102, 255, 0.6)',
+        borderColor: 'rgba(153, 102, 255, 1)',
+        borderWidth: 1,
+      },
+    ],
+  };
+
 
    
   
@@ -352,6 +386,7 @@ const ImportEmployeeshc = () => {
     const [year, month] = monthStr ? monthStr.split('-') : [new Date().getFullYear(), (new Date().getMonth() + 1).toString().padStart(2, '0')];
     return `Month: ${month}, Year: ${year}`;
   };
+
   return (
 
   
@@ -368,6 +403,7 @@ const ImportEmployeeshc = () => {
               className="file-input border border-gray-300 rounded-lg p-2  bg-darkpurple text-white"
             />
             <input type="month" value={month} onChange={handleMonthChange} required className="month-input" />
+
             <button
               type="submit"
               disabled={loading}
@@ -378,6 +414,7 @@ const ImportEmployeeshc = () => {
               {loading ? 'Uploading...' : 'Upload'}
             </button>
           </div>
+
           {message && <p className="message">{message}</p>}
 
 
@@ -394,13 +431,11 @@ const ImportEmployeeshc = () => {
         onChange={handleEnteredMonthChange}
         className="month-input"
       />
-      <button onClick={handleFetchStatistics} className="fetch-button">
-        Fetch Statistics
-      </button>
+
 
           <div className='mr-6'>
             <button
-              onClick={fetchStatistics}
+              onClick={handleFetchStatistics}
               className="refresh-button px-4 py-2 bg-darkpurple text-white rounded-lg hover:bg-purple-700 justify-end"
             >
               Refresh Statistics
@@ -459,6 +494,7 @@ const ImportEmployeeshc = () => {
               scales: {
                 x: { beginAtZero: true, title: { display: true, text: 'Department' } },
                 y: { beginAtZero: true, title: { display: true, text: 'Employee Count' } },
+
               },
             }}
           />
@@ -492,6 +528,7 @@ const ImportEmployeeshc = () => {
                       `${context.label}: ${context.raw.toFixed(2)}%`,
                   },
                 },
+
               },
             }}
           />
@@ -515,7 +552,23 @@ const ImportEmployeeshc = () => {
               },
             }}
           />
+
+<h3 className="text-lg font-semibold mb-4">Unite Distribution</h3>
+          <Bar
+            data={uniteChartData}
+            options={{
+              plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw}` } },
+              },
+              scales: {
+                x: { beginAtZero: true, title: { display: true, text: 'Unite' } },
+                y: { beginAtZero: true, title: { display: true, text: 'Employee Count' } },
+              },
+            }}
+          />
         </div>
+
   
         <div className="statistics-data bg-gray-50 p-6 rounded-lg shadow-lg border-2	border-darkpurple col-span-1 md:col-span-2 mb-4">
           <h3 className="text-lg font-semibold mb-4">Statistics Overview</h3>
@@ -612,7 +665,13 @@ const ImportEmployeeshc = () => {
                     >
                       Edit
                     </button>
-                    
+                    <button
+    onClick={() => handleDeleteStat(stat._id)}
+    className="delete-button bg-red-500 text-white rounded-lg px-2 hover:bg-red-600"
+  >
+    Delete
+  </button>
+
                   </td>
                 </tr>
               ))}

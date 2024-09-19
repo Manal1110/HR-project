@@ -15,6 +15,8 @@ const { logEvents } = require('./middleware/logger');
 const statisticsHubRoutes = require('./routes/statistics_HubRoutes');
 const statisticsCombuRoutes = require('./routes/statistics_CombuRoutes');
 const statisticsHCRoutes = require('./routes/statistics_HCRoutes');
+const statisticsP2Routes = require('./routes/statistics_P2Routes');
+
 
 
 console.log(process.env.NODE_ENV);
@@ -41,9 +43,14 @@ app.use('/gender', require('./routes/genderRoutes'));
 app.use('/employeeshub', require('./routes/employeeshubRoutes'));
 app.use('/employeescombu', require('./routes/employeescombuRoutes'));
 app.use('/employeeshc', require('./routes/employeesHCRoutes'));
+app.use('/employeeshc', require('./routes/employeesHCRoutes'));
+app.use('/employeesp2', require('./routes/employeesp2Routes'));
 app.use('/statisticshub', statisticsHubRoutes);
 app.use('/statisticsCombu', statisticsCombuRoutes);
 app.use('/statisticshc', statisticsHCRoutes);
+app.use('/statisticsp2', statisticsP2Routes);
+
+
 
 
 app.all('*', (req, res) => {

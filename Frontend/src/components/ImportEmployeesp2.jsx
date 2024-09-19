@@ -12,7 +12,7 @@ ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tool
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const ImportEmployeeshub = () => {
+const ImportEmployeesp2 = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -50,7 +50,7 @@ const ImportEmployeeshub = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:3500/employeeshub/import', formData, {
+      const response = await axios.post('http://localhost:3500/employeesp2/import', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -68,7 +68,7 @@ const ImportEmployeeshub = () => {
   const fetchStatistics = async (selectedMonth = enteredMonth) => {
     try {
       // Fetch employee data
-      const employeesResponse = await axios.get('http://localhost:3500/employeeshub');
+      const employeesResponse = await axios.get('http://localhost:3500/employeesp2');
       const employees = employeesResponse.data;
 
       if (employees.length === 0) {
@@ -119,7 +119,6 @@ const ImportEmployeeshub = () => {
         count,
       })));
 
-
       // Calculate unite data
       const unites = {};
       employees.forEach(emp => {
@@ -132,7 +131,7 @@ const ImportEmployeeshub = () => {
       })));
 
       // Fetch statistics data
-      const statisticsResponse = await axios.get('http://localhost:3500/statisticsHub');
+      const statisticsResponse = await axios.get('http://localhost:3500/statisticsp2');
       const statistics = statisticsResponse.data;
 
       if (statistics.length === 0) {
@@ -156,7 +155,6 @@ const ImportEmployeeshub = () => {
       });
 
       setMonthData(monthContributions);
-
     } catch (error) {
       setMessage('Error fetching statistics: ' + error.message);
     }
@@ -165,7 +163,7 @@ const ImportEmployeeshub = () => {
   const handleAddStat = async (event) => {
     event.preventDefault();
     try {
-      await axios.post('http://localhost:3500/statisticsHub', newStat);
+      await axios.post('http://localhost:3500/statisticsp2', newStat);
       setMessage('Statistics added successfully.');
       setNewStat({ year: '', month: '', absenteeism: '', overtime: '', turnover: '' });
       fetchStatistics(); // Refresh statistics data
@@ -173,20 +171,12 @@ const ImportEmployeeshub = () => {
       setMessage('Error adding statistics: ' + error.message);
     }
   };
-  const handleDeleteStat = async (id) => {
-    try {
-      await axios.delete(`http://localhost:3500/statisticsHub/${id}`);
-      setMessage('Statistics deleted successfully.');
-      fetchStatistics(); // Refresh statistics data after deletion
-    } catch (error) {
-      setMessage('Error deleting statistics: ' + error.message);
-    }
-  };
+
   const handleUpdateStat = async (event) => {
     event.preventDefault();
     try {
       if (!editStat) return;
-      await axios.put(`http://localhost:3500/statisticsHub/${editStat._id}`, editStat);
+      await axios.put(`http://localhost:3500/statisticsp2/${editStat._id}`, editStat);
       setMessage('Statistics updated successfully.');
       setEditStat(null);
       fetchStatistics(); // Refresh statistics data
@@ -194,7 +184,15 @@ const ImportEmployeeshub = () => {
       setMessage('Error updating statistics: ' + error.message);
     }
   };
-
+  const handleDeleteStat = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3500/statisticsp2/${id}`);
+      setMessage('Statistics deleted successfully.');
+      fetchStatistics(); // Refresh statistics data after deletion
+    } catch (error) {
+      setMessage('Error deleting statistics: ' + error.message);
+    }
+  };
   const handleEditClick = (stat) => {
     setEditStat(stat);
     setNewStat(stat); // Populate form fields with current stat data for editing
@@ -299,7 +297,7 @@ const ImportEmployeeshub = () => {
     ],
   };
 
-  const uniteChartData = {
+     const uniteChartData = {
     labels: uniteData.map(d => d.unite),
     datasets: [
       {
@@ -312,7 +310,7 @@ const ImportEmployeeshub = () => {
     ],
   };
 
- 
+
   
     const totalIcons = 10; // Number of icons to represent 100%
     const maleIcons = Math.round((genderStats.male / 100) * totalIcons);
@@ -697,6 +695,6 @@ const ImportEmployeeshub = () => {
     </div>
   );
 }
-export default ImportEmployeeshub;
+export default ImportEmployeesp2;
 
  
