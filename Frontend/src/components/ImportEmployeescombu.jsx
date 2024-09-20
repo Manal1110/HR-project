@@ -10,9 +10,7 @@ import { faMale, faFemale } from '@fortawesome/free-solid-svg-icons';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-
-const ImportEmployeescombu = () => {
+const ImportEmployeeshc = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,16 +21,29 @@ const ImportEmployeescombu = () => {
   const [newStat, setNewStat] = useState({ year: '', month: '', absenteeism: '', overtime: '', turnover: '' }); 
   const [editStat, setEditStat] = useState(null);
   const [serviceData, setServiceData] = useState([]); // State for service data
-  const [uniteData, setUniteData] = useState([]); 
   const [month, setMonth] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [enteredMonth, setEnteredMonth] = useState(''); // State for entered month
   const [absenteeismData, setAbsenteeismData] = useState({ absenteeism: 0, turnover: 0, overtime: 0 });
   const [monthData, setMonthData] = useState({});
+  const [uniteData, setUniteData] = useState([]); 
 
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
     setMessage('');
+  };
+
+  const handleMonthChange = (e) => {
+    setMonth(e.target.value);
+  };
+
+  const handleEnteredMonthChange = (e) => {
+    setEnteredMonth(e.target.value);
   };
 
   const handleSubmit = async (event) => {
@@ -43,8 +54,15 @@ const ImportEmployeescombu = () => {
       return;
     }
 
+    if (!month) {
+      setMessage('Please select a month.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('month', month);
+
 
     setLoading(true);
 
@@ -68,9 +86,9 @@ const ImportEmployeescombu = () => {
     const currentMonth = new Date().toISOString().slice(0, 7); // Get current month in YYYY-MM format
     const monthToFetch = selectedMonth || currentMonth;
     const formattedMonth = monthToFetch.split('-').reverse().join('-');
+
     try {
-      // Fetch employee data
-      const employeesResponse = await axios.get('http://localhost:3500/employeescombu');
+      const employeesResponse = await axios.get(`http://localhost:3500/employeescombu/month/${monthToFetch}`);
       const employees = employeesResponse.data;
 
       if (employees.length === 0) {
@@ -110,7 +128,6 @@ const ImportEmployeescombu = () => {
         count,
       })));
 
-
       // Calculate service data
       const services = {};
       employees.forEach(emp => {
@@ -122,6 +139,7 @@ const ImportEmployeescombu = () => {
         count,
       })));
 
+      
       // Calculate unite data
       const unites = {};
       employees.forEach(emp => {
@@ -134,7 +152,7 @@ const ImportEmployeescombu = () => {
       })));
 
       // Fetch statistics data
-      const statisticsResponse = await axios.get('http://localhost:3500/statisticsCombu');
+      const statisticsResponse = await axios.get('http://localhost:3500/statisticscombu');
       const statistics = statisticsResponse.data;
 
       if (statistics.length === 0) {
@@ -159,17 +177,70 @@ const ImportEmployeescombu = () => {
 
       setMonthData(monthContributions);
 
+
     } catch (error) {
       setMessage('Error fetching statistics: ' + error.message);
     }
   };
 
 
+  const getStackedBarData = () => {
+    const months = Object.keys(monthData);
   
+    // Map month numbers to month names
+    const monthLabels = months.map(month => {
+      const monthIndex = parseInt(month, 10) - 1; // Convert month number to zero-based index
+      return monthNames[monthIndex] || 'Unknown'; // Default to 'Unknown' if out of range
+    });
+  
+    // Prepare datasets for each month
+    const datasets = months.map((month, index) => {
+      return {
+        label: monthLabels[index],
+        data: [
+          monthData[month].absenteeism,
+          monthData[month].turnover,
+          monthData[month].overtime
+        ],
+        backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`,
+        borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
+        borderWidth: 1,
+      };
+    });
+  
+    return {
+      labels: ['Absenteeism', 'Turnover', 'Overtime'], // Metrics on x-axis
+      datasets: datasets
+    };
+  };
+  
+  const stackedBarChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { display: true },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.dataset.label}: ${context.raw.toFixed(2)}`
+        }
+      }
+    },
+    scales: {
+      x: { 
+        stacked: true, 
+        title: { display: true, text: 'Metrics' },
+      },
+      y: { 
+        stacked: true, 
+        title: { display: true, text: 'Total Value' }, 
+        beginAtZero: true 
+      }
+    }
+  };
+
   const handleAddStat = async (event) => {
     event.preventDefault();
     try {
-      await axios.post('http://localhost:3500/statisticsCombu', newStat);
+      await axios.post('http://localhost:3500/statisticscombu', newStat);
       setMessage('Statistics added successfully.');
       setNewStat({ year: '', month: '', absenteeism: '', overtime: '', turnover: '' });
       fetchStatistics(); // Refresh statistics data
@@ -182,7 +253,7 @@ const ImportEmployeescombu = () => {
     event.preventDefault();
     try {
       if (!editStat) return;
-      await axios.put(`http://localhost:3500/statisticsCombu/${editStat._id}`, editStat);
+      await axios.put(`http://localhost:3500/statisticscombu/${editStat._id}`, editStat);
       setMessage('Statistics updated successfully.');
       setEditStat(null);
       fetchStatistics(); // Refresh statistics data
@@ -193,23 +264,24 @@ const ImportEmployeescombu = () => {
 
   const handleDeleteStat = async (id) => {
     try {
-      await axios.delete(`http://localhost:3500/statisticsCombu/${id}`);
+      await axios.delete(`http://localhost:3500/statisticscombu/${id}`);
       setMessage('Statistics deleted successfully.');
       fetchStatistics(); // Refresh statistics data after deletion
     } catch (error) {
       setMessage('Error deleting statistics: ' + error.message);
     }
   };
-  
-  
   const handleEditClick = (stat) => {
     setEditStat(stat);
     setNewStat(stat); // Populate form fields with current stat data for editing
   };
-
   useEffect(() => {
     fetchStatistics(); // Fetch statistics on initial render
   }, []);
+
+  const handleFetchStatistics = () => {
+    fetchStatistics(enteredMonth);
+  };
 
   const departmentChartData = {
     labels: departmentData.map(d => d.department),
@@ -223,21 +295,6 @@ const ImportEmployeescombu = () => {
       },
     ],
   };
-
-  const genderHistogramData = {
-    labels: ['Males', 'Females'],
-    datasets: [
-      {
-        label: 'Percentage',
-        data: [genderStats.male, genderStats.female],
-        backgroundColor: ['rgba(54, 162, 235, 0.6)', 'rgba(255, 99, 132, 0.6)'],
-        borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
-        borderWidth: 1,
-      },
-    ],
-  };
-
- 
 
   const genderPieData = {
     labels: ['Males', 'Females'],
@@ -304,7 +361,6 @@ const ImportEmployeescombu = () => {
       },
     ],
   };
-
   const uniteChartData = {
     labels: uniteData.map(d => d.unite),
     datasets: [
@@ -331,76 +387,6 @@ const ImportEmployeescombu = () => {
     return `Month: ${month}, Year: ${year}`;
   };
 
-  const handleMonthChange = (e) => {
-    setMonth(e.target.value);
-  };
-
-  const handleEnteredMonthChange = (e) => {
-    setEnteredMonth(e.target.value);
-  };
-
-
-  const handleFetchStatistics = () => {
-    fetchStatistics(enteredMonth);
-  };
-
-  const getStackedBarData = () => {
-    const months = Object.keys(monthData);
-  
-    // Map month numbers to month names
-    const monthLabels = months.map(month => {
-      const monthIndex = parseInt(month, 10) - 1; // Convert month number to zero-based index
-      return monthNames[monthIndex] || 'Unknown'; // Default to 'Unknown' if out of range
-    });
-  
-    // Prepare datasets for each month
-    const datasets = months.map((month, index) => {
-      return {
-        label: monthLabels[index],
-        data: [
-          monthData[month].absenteeism,
-          monthData[month].turnover,
-          monthData[month].overtime
-        ],
-        backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`,
-        borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
-        borderWidth: 1,
-      };
-    });
-  
-    return {
-      labels: ['Absenteeism', 'Turnover', 'Overtime'], // Metrics on x-axis
-      datasets: datasets
-    };
-  };
-  
-  const stackedBarChartOptions = {
-    responsive: true,
-    plugins: {
-      legend: { display: true },
-      tooltip: {
-        callbacks: {
-          label: (context) => `${context.dataset.label}: ${context.raw.toFixed(2)}`
-        }
-      }
-    },
-    scales: {
-      x: { 
-        stacked: true, 
-        title: { display: true, text: 'Metrics' },
-      },
-      y: { 
-        stacked: true, 
-        title: { display: true, text: 'Total Value' }, 
-        beginAtZero: true 
-      }
-    }
-  };
-
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
   return (
 
   
@@ -583,7 +569,6 @@ const ImportEmployeescombu = () => {
           />
         </div>
 
-
   
         <div className="statistics-data bg-gray-50 p-6 rounded-lg shadow-lg border-2	border-darkpurple col-span-1 md:col-span-2 mb-4">
           <h3 className="text-lg font-semibold mb-4">Statistics Overview</h3>
@@ -680,7 +665,6 @@ const ImportEmployeescombu = () => {
                     >
                       Edit
                     </button>
-
                     <button
     onClick={() => handleDeleteStat(stat._id)}
     className="delete-button bg-red-500 text-white rounded-lg px-2 hover:bg-red-600"
@@ -706,7 +690,6 @@ const ImportEmployeescombu = () => {
     </div>
   );
 }
+export default ImportEmployeeshc;
 
  
-
-export default ImportEmployeescombu;

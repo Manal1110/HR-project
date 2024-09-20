@@ -6,7 +6,8 @@ const {
   getEmployeecombuById,
   updateEmployeecombu,
   deleteEmployeecombu,
-  importEmployeescombu
+  importEmployeescombu,
+  getEmployeescombuByMonth
 } = require('../controllers/employeescombuController');
 
 // Route to create a new employee
@@ -26,5 +27,6 @@ router.delete('/:id', deleteEmployeecombu);
 
 
 router.post('/import', importEmployeescombu);
-
+router.post('/import', importEmployeescombu);
+router.get('/month/:month', getEmployeescombuByMonth);
 module.exports = router;

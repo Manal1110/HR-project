@@ -82,6 +82,11 @@ const importEmployeesp2 = async (req, res) => {
         return res.status(400).json({ message: 'File upload failed: ' + err.message });
       }
 
+      const { month } = req.body; // Get the month from the request body
+      if (!month) {
+        return res.status(400).json({ message: 'Month is required' });
+      }
+
       const filePath = req.file.path;
       const workbook = xlsx.readFile(filePath);
       const sheetNames = workbook.SheetNames;
@@ -93,7 +98,7 @@ const importEmployeesp2 = async (req, res) => {
       const savedEmployees = [];
       for (const item of data) {
         try {
-          const newEmployee = new Employeep2(item);
+          const newEmployee = new Employeep2({ ...item, month });
           const savedEmployee = await newEmployee.save();
           savedEmployees.push(savedEmployee);
         } catch (saveError) {
@@ -113,6 +118,29 @@ const importEmployeesp2 = async (req, res) => {
 };
 
 
+// Get employees by month
+const getEmployeesp2ByMonth = async (req, res) => {
+  try {
+    const { month } = req.params; // Get the month from the request parameters
+    if (!month) {
+      return res.status(400).json({ message: 'Month is required' });
+    }
+
+    const employees = await Employeep2.find({ month });
+    if (employees.length === 0) {
+      return res.status(404).json({ message: 'No employees found for the specified month' });
+    }
+
+    res.status(200).json(employees);
+  } catch (error) {
+    console.error('Error fetching employees by month:', error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+
 
 module.exports = {
   createEmployeep2,
@@ -120,5 +148,6 @@ module.exports = {
   getEmployeep2ById,
   updateEmployeep2,
   deleteEmployeep2,
-  importEmployeesp2
+  importEmployeesp2,
+  getEmployeesp2ByMonth
 };

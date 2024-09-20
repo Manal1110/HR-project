@@ -71,6 +71,11 @@ const Pointage = () => {
   const [showAnalysis, setShowAnalysis] = useState(false);
   const chartRef = useRef(null);
 
+  const refreshData = () => {
+    fetchPointages();
+    setRefreshKey(prevKey => prevKey + 1); // Optional: you can keep this if you want to reset the refresh key
+  };
+  
 
   useEffect(() => {
     fetchPointages();
@@ -271,6 +276,11 @@ const Pointage = () => {
       <button onClick={toggleForm} className="button">
         {showForm ? 'Close Form' : 'Add New Pointage'}
       </button>
+
+<button onClick={fetchPointages} className="button">
+  Refresh Data
+</button>
+
       {showForm && (
         <form onSubmit={handleSubmit} className="form">
           <input

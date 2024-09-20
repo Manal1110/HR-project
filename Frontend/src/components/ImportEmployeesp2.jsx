@@ -10,9 +10,7 @@ import { faMale, faFemale } from '@fortawesome/free-solid-svg-icons';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-
-const ImportEmployeesp2 = () => {
+const ImportEmployeeshc = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,10 +28,22 @@ const ImportEmployeesp2 = () => {
   const [monthData, setMonthData] = useState({});
   const [uniteData, setUniteData] = useState([]); 
 
-
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
     setMessage('');
+  };
+
+  const handleMonthChange = (e) => {
+    setMonth(e.target.value);
+  };
+
+  const handleEnteredMonthChange = (e) => {
+    setEnteredMonth(e.target.value);
   };
 
   const handleSubmit = async (event) => {
@@ -44,8 +54,15 @@ const ImportEmployeesp2 = () => {
       return;
     }
 
+    if (!month) {
+      setMessage('Please select a month.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('month', month);
+
 
     setLoading(true);
 
@@ -66,9 +83,12 @@ const ImportEmployeesp2 = () => {
   };
 
   const fetchStatistics = async (selectedMonth = enteredMonth) => {
+    const currentMonth = new Date().toISOString().slice(0, 7); // Get current month in YYYY-MM format
+    const monthToFetch = selectedMonth || currentMonth;
+    const formattedMonth = monthToFetch.split('-').reverse().join('-');
+
     try {
-      // Fetch employee data
-      const employeesResponse = await axios.get('http://localhost:3500/employeesp2');
+      const employeesResponse = await axios.get(`http://localhost:3500/employeesp2/month/${monthToFetch}`);
       const employees = employeesResponse.data;
 
       if (employees.length === 0) {
@@ -119,6 +139,7 @@ const ImportEmployeesp2 = () => {
         count,
       })));
 
+      
       // Calculate unite data
       const unites = {};
       employees.forEach(emp => {
@@ -155,8 +176,64 @@ const ImportEmployeesp2 = () => {
       });
 
       setMonthData(monthContributions);
+
+
     } catch (error) {
       setMessage('Error fetching statistics: ' + error.message);
+    }
+  };
+
+
+  const getStackedBarData = () => {
+    const months = Object.keys(monthData);
+  
+    // Map month numbers to month names
+    const monthLabels = months.map(month => {
+      const monthIndex = parseInt(month, 10) - 1; // Convert month number to zero-based index
+      return monthNames[monthIndex] || 'Unknown'; // Default to 'Unknown' if out of range
+    });
+  
+    // Prepare datasets for each month
+    const datasets = months.map((month, index) => {
+      return {
+        label: monthLabels[index],
+        data: [
+          monthData[month].absenteeism,
+          monthData[month].turnover,
+          monthData[month].overtime
+        ],
+        backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`,
+        borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
+        borderWidth: 1,
+      };
+    });
+  
+    return {
+      labels: ['Absenteeism', 'Turnover', 'Overtime'], // Metrics on x-axis
+      datasets: datasets
+    };
+  };
+  
+  const stackedBarChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { display: true },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.dataset.label}: ${context.raw.toFixed(2)}`
+        }
+      }
+    },
+    scales: {
+      x: { 
+        stacked: true, 
+        title: { display: true, text: 'Metrics' },
+      },
+      y: { 
+        stacked: true, 
+        title: { display: true, text: 'Total Value' }, 
+        beginAtZero: true 
+      }
     }
   };
 
@@ -184,6 +261,7 @@ const ImportEmployeesp2 = () => {
       setMessage('Error updating statistics: ' + error.message);
     }
   };
+
   const handleDeleteStat = async (id) => {
     try {
       await axios.delete(`http://localhost:3500/statisticsp2/${id}`);
@@ -197,10 +275,13 @@ const ImportEmployeesp2 = () => {
     setEditStat(stat);
     setNewStat(stat); // Populate form fields with current stat data for editing
   };
-
   useEffect(() => {
     fetchStatistics(); // Fetch statistics on initial render
   }, []);
+
+  const handleFetchStatistics = () => {
+    fetchStatistics(enteredMonth);
+  };
 
   const departmentChartData = {
     labels: departmentData.map(d => d.department),
@@ -214,22 +295,6 @@ const ImportEmployeesp2 = () => {
       },
     ],
   };
-
-  const genderHistogramData = {
-    labels: ['Males', 'Females'],
-    datasets: [
-      {
-        label: 'Percentage',
-        data: [genderStats.male, genderStats.female],
-        backgroundColor: ['rgba(54, 162, 235, 0.6)', 'rgba(255, 99, 132, 0.6)'],
-        borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-
-
 
   const genderPieData = {
     labels: ['Males', 'Females'],
@@ -296,8 +361,7 @@ const ImportEmployeesp2 = () => {
       },
     ],
   };
-
-     const uniteChartData = {
+  const uniteChartData = {
     labels: uniteData.map(d => d.unite),
     datasets: [
       {
@@ -311,6 +375,7 @@ const ImportEmployeesp2 = () => {
   };
 
 
+   
   
     const totalIcons = 10; // Number of icons to represent 100%
     const maleIcons = Math.round((genderStats.male / 100) * totalIcons);
@@ -321,77 +386,6 @@ const ImportEmployeesp2 = () => {
     const [year, month] = monthStr ? monthStr.split('-') : [new Date().getFullYear(), (new Date().getMonth() + 1).toString().padStart(2, '0')];
     return `Month: ${month}, Year: ${year}`;
   };
-
-  const handleMonthChange = (e) => {
-    setMonth(e.target.value);
-  };
-
-  const handleEnteredMonthChange = (e) => {
-    setEnteredMonth(e.target.value);
-  };
-
-
-  const handleFetchStatistics = () => {
-    fetchStatistics(enteredMonth);
-  };
-
-  const getStackedBarData = () => {
-    const months = Object.keys(monthData);
-  
-    // Map month numbers to month names
-    const monthLabels = months.map(month => {
-      const monthIndex = parseInt(month, 10) - 1; // Convert month number to zero-based index
-      return monthNames[monthIndex] || 'Unknown'; // Default to 'Unknown' if out of range
-    });
-  
-    // Prepare datasets for each month
-    const datasets = months.map((month, index) => {
-      return {
-        label: monthLabels[index],
-        data: [
-          monthData[month].absenteeism,
-          monthData[month].turnover,
-          monthData[month].overtime
-        ],
-        backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`,
-        borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
-        borderWidth: 1,
-      };
-    });
-  
-    return {
-      labels: ['Absenteeism', 'Turnover', 'Overtime'], // Metrics on x-axis
-      datasets: datasets
-    };
-  };
-  
-  const stackedBarChartOptions = {
-    responsive: true,
-    plugins: {
-      legend: { display: true },
-      tooltip: {
-        callbacks: {
-          label: (context) => `${context.dataset.label}: ${context.raw.toFixed(2)}`
-        }
-      }
-    },
-    scales: {
-      x: { 
-        stacked: true, 
-        title: { display: true, text: 'Metrics' },
-      },
-      y: { 
-        stacked: true, 
-        title: { display: true, text: 'Total Value' }, 
-        beginAtZero: true 
-      }
-    }
-  };
-
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
 
   return (
 
@@ -677,6 +671,7 @@ const ImportEmployeesp2 = () => {
   >
     Delete
   </button>
+
                   </td>
                 </tr>
               ))}
@@ -695,6 +690,6 @@ const ImportEmployeesp2 = () => {
     </div>
   );
 }
-export default ImportEmployeesp2;
+export default ImportEmployeeshc;
 
  

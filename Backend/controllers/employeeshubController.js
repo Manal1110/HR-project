@@ -74,12 +74,17 @@ const upload = multer({ storage: storage });
 
 // Function to import employees from an Excel file
 // Update importEmployees function in employeeshubController.js
-const importEmployeeshub = async (req, res) => {
+const importEmployeeshub= async (req, res) => {
   try {
     upload.single('file')(req, res, async (err) => {
       if (err) {
         console.error('File upload error:', err.message);
         return res.status(400).json({ message: 'File upload failed: ' + err.message });
+      }
+
+      const { month } = req.body; // Get the month from the request body
+      if (!month) {
+        return res.status(400).json({ message: 'Month is required' });
       }
 
       const filePath = req.file.path;
@@ -93,7 +98,7 @@ const importEmployeeshub = async (req, res) => {
       const savedEmployees = [];
       for (const item of data) {
         try {
-          const newEmployee = new Employeehub(item);
+          const newEmployee = new Employeehub({ ...item, month });
           const savedEmployee = await newEmployee.save();
           savedEmployees.push(savedEmployee);
         } catch (saveError) {
@@ -113,6 +118,26 @@ const importEmployeeshub = async (req, res) => {
 };
 
 
+// Get employees by month
+const getEmployeeshubByMonth = async (req, res) => {
+  try {
+    const { month } = req.params; // Get the month from the request parameters
+    if (!month) {
+      return res.status(400).json({ message: 'Month is required' });
+    }
+
+    const employees = await Employeehub.find({ month });
+    if (employees.length === 0) {
+      return res.status(404).json({ message: 'No employees found for the specified month' });
+    }
+
+    res.status(200).json(employees);
+  } catch (error) {
+    console.error('Error fetching employees by month:', error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 module.exports = {
   createEmployeehub,
@@ -120,5 +145,6 @@ module.exports = {
   getEmployeehubById,
   updateEmployeehub,
   deleteEmployeehub,
-  importEmployeeshub
+  importEmployeeshub,
+  getEmployeeshubByMonth
 };

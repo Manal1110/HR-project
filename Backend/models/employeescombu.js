@@ -30,7 +30,8 @@ const employeecombuSchema = new mongoose.Schema({
   SITE2: { type: String },
   Projet: { type: String },
   "Total Production": { type: String },
-  "CHEF DIRECT": { type: String }
+  "CHEF DIRECT": { type: String },
+  month: { type: String, required: true },
 });
 
 
