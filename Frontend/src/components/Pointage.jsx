@@ -281,24 +281,114 @@ const Pointage = () => {
   Refresh Data
 </button>
 
-      {showForm && (
-        <form onSubmit={handleSubmit} className="form">
-          <input
-            type="text"
-            name="DATE"
-            value={form.DATE}
-            onChange={handleChange}
-            placeholder="Date (dd/mm/yyyy)"
-            className="input"
-            required
-          />
-          {/* Add other input fields here */}
-          <button type="submit" className="button">
-            {editing ? 'Update Pointage' : 'Add Pointage'}
-          </button>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-        </form>
-      )}
+{showForm && (
+  <form onSubmit={handleSubmit} className="form">
+    <input
+      type="text"
+      name="DATE"
+      value={form.DATE}
+      onChange={handleChange}
+      placeholder="Date (dd/mm/yyyy)"
+      className="input"
+      required
+    />
+    <input
+      type="text"
+      name="MATRICULE"
+      value={form.MATRICULE}
+      onChange={handleChange}
+      placeholder="Matrícula"
+      className="input"
+      required
+    />
+    <input
+      type="text"
+      name="NOM"
+      value={form.NOM}
+      onChange={handleChange}
+      placeholder="Nom"
+      className="input"
+      required
+    />
+    <input
+      type="text"
+      name="PRENOM"
+      value={form.PRENOM}
+      onChange={handleChange}
+      placeholder="Prénom"
+      className="input"
+      required
+    />
+    <input
+      type="text"
+      name="UNITE"
+      value={form.UNITE}
+      onChange={handleChange}
+      placeholder="Unité"
+      className="input"
+      required
+    />
+    <input
+      type="text"
+      name="TYPE"
+      value={form.TYPE}
+      onChange={handleChange}
+      placeholder="Type"
+      className="input"
+      required
+    />
+    <input
+      type="text"
+      name="SERVICE"
+      value={form.SERVICE}
+      onChange={handleChange}
+      placeholder="Service"
+      className="input"
+      required
+    />
+    <input
+      type="time"
+      name="ENTREE"
+      value={form.ENTREE}
+      onChange={handleChange}
+      placeholder="Entrée"
+      className="input"
+      required
+    />
+    <input
+      type="time"
+      name="SORTIE"
+      value={form.SORTIE}
+      onChange={handleChange}
+      placeholder="Sortie"
+      className="input"
+      required
+    />
+    <input
+      type="text"
+      name="HN"
+      value={form.HN}
+      onChange={handleChange}
+      placeholder="HN"
+      className="input"
+      required
+    />
+    <input
+      type="text"
+      name="MOTIF"
+      value={form.MOTIF}
+      onChange={handleChange}
+      placeholder="Motif"
+      className="input"
+      required
+    />
+    <button type="submit" className="button">
+      {editing ? 'Update Pointage' : 'Add Pointage'}
+    </button>
+    {error && <p style={{ color: 'red' }}>{error}</p>}
+  </form>
+)}
+
       <button onClick={exportToExcel} className="button">
         Export to Excel
       </button>

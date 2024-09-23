@@ -12,7 +12,7 @@ const pointageSchema = new mongoose.Schema({
   ENTREE: { type: String, required: true },
   SORTIE: { type: String, required: true },
   HN: { type: Number, required: true },
-  MOTIF: { type: String, required: true }
+  MOTIF: { type: String }
 });
 
 module.exports = mongoose.model('Pointage', pointageSchema);
