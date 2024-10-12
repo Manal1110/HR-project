@@ -7,7 +7,8 @@ const {
   updateEmployeehub,
   deleteEmployeehub,
   importEmployeeshub,
-  getEmployeeshubByMonth
+  getEmployeeshubByMonth,
+  deleteEmployeesByMonth
 } = require('../controllers/employeeshubController');
 
 // Route to create a new employee
@@ -28,5 +29,6 @@ router.delete('/:id', deleteEmployeehub);
 
 router.post('/import', importEmployeeshub);
 router.get('/month/:month', getEmployeeshubByMonth);
+router.delete('/month/:month', deleteEmployeesByMonth); 
 
 module.exports = router;

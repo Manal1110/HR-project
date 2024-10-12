@@ -138,6 +138,26 @@ const getEmployeescombuByMonth = async (req, res) => {
   }
 };
 
+// Delete employees by month
+const deleteEmployeesByMonth = async (req, res) => {
+  try {
+    const { month } = req.params; // Get the month from the request parameters
+    if (!month) {
+      return res.status(400).json({ message: 'Month is required' });
+    }
+
+    const deletedEmployees = await Employeecombu.deleteMany({ month });
+    if (deletedEmployees.deletedCount === 0) {
+      return res.status(404).json({ message: 'No employees found for the specified month' });
+    }
+
+    res.status(200).json({ message: `Employees hired in ${month} deleted successfully.` });
+  } catch (error) {
+    console.error('Error deleting employees by month:', error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createEmployeecombu,
   getEmployeescombu,
@@ -145,5 +165,6 @@ module.exports = {
   updateEmployeecombu,
   deleteEmployeecombu,
   importEmployeescombu,
-  getEmployeescombuByMonth
+  getEmployeescombuByMonth,
+  deleteEmployeesByMonth
 };

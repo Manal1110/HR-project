@@ -7,7 +7,8 @@ const {
   updateEmployeep2,
   deleteEmployeep2,
   importEmployeesp2,
-  getEmployeesp2ByMonth
+  getEmployeesp2ByMonth,
+  deleteEmployeesByMonth
 } = require('../controllers/employeesp2Controller');
 
 // Route to create a new employee
@@ -30,4 +31,5 @@ router.post('/import', importEmployeesp2);
 
 router.post('/import', importEmployeesp2);
 router.get('/month/:month', getEmployeesp2ByMonth);
+router.delete('/month/:month', deleteEmployeesByMonth); 
 module.exports = router;

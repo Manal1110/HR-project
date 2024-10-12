@@ -1,16 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const EmployeeTable = ({ filteredEmployees, selectedFields, handleEditClick, handleDelete }) => {
+    const [selectedEmployees, setSelectedEmployees] = useState({});
+
+    const handleSelectEmployee = (id) => {
+        setSelectedEmployees((prev) => ({
+            ...prev,
+            [id]: !prev[id], // Toggle the selection
+        }));
+    };
+
+    const handleSelectAll = (isChecked) => {
+        const newSelection = {};
+        filteredEmployees.forEach((employee) => {
+            newSelection[employee._id] = isChecked; // Set all to checked or unchecked
+        });
+        setSelectedEmployees(newSelection);
+    };
+
+    const handleDeleteSelected = () => {
+        const idsToDelete = Object.keys(selectedEmployees).filter((id) => selectedEmployees[id]);
+        idsToDelete.forEach((id) => handleDelete(id));
+        // Reset selected employees after deletion
+        setSelectedEmployees({});
+    };
+
+    const isAllSelected = filteredEmployees.length > 0 && 
+                          filteredEmployees.every(employee => selectedEmployees[employee._id]);
+
     return (
         <div className="table-container max-w-full overflow-x-auto overflow-y-auto">
+            <button 
+                onClick={handleDeleteSelected}
+                className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 mb-4 rounded"
+            >
+                Delete Selected
+            </button>
             <table className="min-w-full border-collapse">
                 <thead>
                     <tr className="bg-darkpurple text-white">
-                        {selectedFields.profilePic && <th className="px-12 py-8 whitespace-nowrap">Profile Picture</th>}
-                        {selectedFields.matricule && <th className="px-12 py-8 whitespace-nowrap">Matricule</th>}
-                        {selectedFields.name && <th className="px-12 py-8 whitespace-nowrap">Name</th>}
-                        {selectedFields.firstName && <th className="px-12 py-8 whitespace-nowrap">First Name</th>}
-                        {selectedFields.unite && <th className="px-12 py-8 whitespace-nowrap">Unite</th>}
+                        <th className="px-2 py-4 whitespace-nowrap">
+                            <input
+                                type="checkbox"
+                                checked={isAllSelected}
+                                onChange={(e) => handleSelectAll(e.target.checked)}
+                            />
+                        </th>
+                        {selectedFields.profilePic && <th className="px-12 py-4 whitespace-nowrap">Profile Picture</th>}
+                        {selectedFields.matricule && <th className="px-12 py-4 whitespace-nowrap">Matricule</th>}
+                        {selectedFields.name && <th className="px-12 py-4 whitespace-nowrap">Name</th>}
+                        {selectedFields.firstName && <th className="px-12 py-4 whitespace-nowrap">First Name</th>}
+                        {selectedFields.unite && <th className="px-12 py-4 whitespace-nowrap">Unite</th>}
                         {selectedFields.department && <th className="px-12 py-4 whitespace-nowrap">Department</th>}
                         {selectedFields.kind && <th className="px-12 py-4 whitespace-nowrap">Kind</th>}
                         {selectedFields.situation && <th className="px-12 py-4 whitespace-nowrap">Situation</th>}
@@ -42,6 +82,13 @@ const EmployeeTable = ({ filteredEmployees, selectedFields, handleEditClick, han
                             key={employee._id}
                             className={`transition-colors duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white hover:bg-midpurple' : 'bg-lightpurple hover:bg-midpurple'}`}
                         >
+                            <td className="px-2 py-8 whitespace-nowrap text-center align-middle">
+                                <input
+                                    type="checkbox"
+                                    checked={!!selectedEmployees[employee._id]}
+                                    onChange={() => handleSelectEmployee(employee._id)}
+                                />
+                            </td>
                             {selectedFields.profilePic && (
                                 <td className="px-2 py-1 whitespace-nowrap text-center align-middle">
                                     {employee.profilePic && (
@@ -77,21 +124,13 @@ const EmployeeTable = ({ filteredEmployees, selectedFields, handleEditClick, han
                             {selectedFields.speciality && <td className="px-2 py-8 whitespace-nowrap text-center align-middle">{employee.speciality}</td>}
                             {selectedFields.adresse && <td className="px-2 py-8 whitespace-nowrap text-center align-middle">{employee.adresse}</td>}
                             {selectedFields.pointage && <td className="px-2 py-8 whitespace-nowrap text-center align-middle">{employee.pointage}</td>}
-                            <td className="px-2 py-8 whitespace-nowrap">
-                                <div className="flex space-x-2">
-                                    <button
-                                        onClick={() => handleEditClick(employee)}
-                                        className="bg-darkpurple hover:bg-hoverpurple text-white px-2 py-1 rounded"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(employee._id)}
-                                        className="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
+                            <td className="px-2 py-8 whitespace-nowrap text-center align-middle">
+                                <button
+                                    onClick={() => handleEditClick(employee)}
+                                    className="bg-green-500 hover:bg-green-700 text-white px-4 py-1 rounded"
+                                >
+                                    Edit
+                                </button>
                             </td>
                         </tr>
                     ))}

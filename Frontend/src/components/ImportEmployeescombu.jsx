@@ -387,6 +387,25 @@ const ImportEmployeeshc = () => {
     return `Month: ${month}, Year: ${year}`;
   };
 
+
+  
+  const [deleteMonth, setDeleteMonth] = useState('');
+  const [deleteMessage, setDeleteMessage] = useState('');
+  
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    setDeleteMessage('');
+  
+    try {
+      const response = await axios.delete(`http://localhost:3500/employeescombu/month/${deleteMonth}`);
+      setDeleteMessage(response.data.message); // Set success message
+      setDeleteMonth(''); // Clear input after successful delete
+    } catch (error) {
+      setDeleteMessage(error.response ? error.response.data.message : 'Error deleting employees'); // Set error message
+    }
+  };
+  
+
   return (
 
   
@@ -448,6 +467,28 @@ const ImportEmployeeshc = () => {
       </form>
       {message && <p className="message text-red-600 text-center mb-4">{message}</p>}
   
+                    {/* New Section for Deleting Employees */}
+      <h2 className="text-center text-2xl font-bold mb-5 text-darkpurple">Delete Employees by Month</h2>
+      <form onSubmit={handleDelete} className="form mb-6 flex justify-center">
+        <div className="flex items-center">
+          <input
+            type="month"
+            value={deleteMonth}
+            onChange={(e) => setDeleteMonth(e.target.value)} // Assuming you have a state setDeleteMonth
+            required
+            className="month-input border border-gray-300 rounded-lg p-2"
+          />
+          <button
+            type="submit"
+            className="delete-button px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 ml-4"
+          >
+            Delete Employees
+          </button>
+        </div>
+      </form>
+      {deleteMessage && <p className="message text-red-600 text-center mb-4">{deleteMessage}</p>} {/* For success/error message */}
+
+
       </div>
       
       

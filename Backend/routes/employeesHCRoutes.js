@@ -7,7 +7,8 @@ const {
   updateEmployeehc,
   deleteEmployeehc,
   importEmployeeshc,
-  getEmployeeshcByMonth
+  getEmployeeshcByMonth,
+  deleteEmployeesByMonth
 } = require('../controllers/employeeshcController');
 
 // Route to create a new employee
@@ -29,7 +30,7 @@ router.delete('/:id', deleteEmployeehc);
 router.post('/import', importEmployeeshc);
 
 router.get('/month/:month', getEmployeeshcByMonth);
-
+router.delete('/month/:month', deleteEmployeesByMonth); 
 
 
 module.exports = router;
