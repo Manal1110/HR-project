@@ -1,0 +1,14 @@
+/* styles.css */
+.gender-stats-container {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.gender-stats-container h2 {
+    margin-bottom: 20px;
+}
+
+.gender-stats-container p {
+    margin: 10px 0;
+}

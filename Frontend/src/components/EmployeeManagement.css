@@ -1,0 +1,47 @@
+/* Scrollbar Styles */
+.table-container::-webkit-scrollbar {
+    width: 12px;
+    height: 6px;
+
+
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #01008A; /* Purple color */
+    border-radius: 10px;
+    transition: height 0.8s ease;
+}
+
+
+
+/* Hover Scrollbar Styles */
+.table-container:hover::-webkit-scrollbar {
+    height: 12px;
+}
+
+/* EmployeeManagement.css */
+
+.modal {
+    transition: transform 0.3s ease-in-out;
+}
+
+.modal-enter {
+    transform: translateY(-50%);
+}
+
+.modal-enter-active {
+    transform: translateY(0);
+}
+
+.modal-exit {
+    transform: translateY(0);
+}
+
+.modal-exit-active {
+    transform: translateY(-50%);
+}
